@@ -3,10 +3,14 @@ import { NgModule } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { StartMenuComponent } from './components/start-menu/start-menu.component';
+import { ParentMapComponent } from './parent-map/parent-map.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    StartMenuComponent,
+    ParentMapComponent
   ],
   imports: [
     BrowserModule,

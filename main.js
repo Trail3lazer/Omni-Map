@@ -1,4 +1,7 @@
-const {app, BrowserWindow} = require('electron')
+const {app, BrowserWindow} = require('electron');
+const { menuBuilder } = require("./application/menu");
+
+
     const url = require("url");
     const path = require("path");
 
@@ -6,8 +9,8 @@ const {app, BrowserWindow} = require('electron')
 
     function createWindow () {
       mainWindow = new BrowserWindow({
-        width: 800,
-        height: 600,
+        width: 1000,
+        height: 700,
         webPreferences: {
           nodeIntegration: true
         }
@@ -35,5 +38,6 @@ const {app, BrowserWindow} = require('electron')
     })
 
     app.on('activate', function () {
+      menuBuilder()
       if (mainWindow === null) createWindow()
     })

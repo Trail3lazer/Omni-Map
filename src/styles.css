@@ -1,1 +1,5 @@
 /* You can add global styles to this file, and also import other style files */
+
+.shadow {
+    box-shadow: 1 1 3 4 darkgrey;
+}
