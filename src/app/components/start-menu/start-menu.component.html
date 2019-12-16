@@ -1,7 +1,11 @@
 <div class="container h-100 d-flex justify-content-center h-100">
     <div class="list-group-flush shadow col-md-6 mt-5 p-3 rounded">
-        <button type="button" class="list-group-item list-group-item-action">A Whole New World</button>
-        <button type="button" class="list-group-item list-group-item-action">Load</button>
-        <routerLink href="/test" type="button" class="list-group-item list-group-item-action">Test</routerLink>
+        <input type="file" 
+            class="list-group-item list-group-item-action" 
+            (change)="newProject($event.target.files)">
+        <input type="file" 
+            class="list-group-item list-group-item-action" 
+            (change)="loadProject($event.target.files)">
+        <a [routerLink]="test" type="" class="list-group-item list-group-item-action">Test</a>
     </div>
 </div>
