@@ -1,6 +1,6 @@
 import { NgModule } from "@angular/core";
 import { Routes, RouterModule } from "@angular/router";
-import { ParentMapComponent } from "./parent-map/parent-map.component";
+import { ProjectComponent } from "./project/project.component";
 
 
 const routes: Routes = [];
@@ -11,6 +11,6 @@ const routes: Routes = [];
 })
 export class AppRoutingModule {
   routes = [
-    { path: "test", component: ParentMapComponent },
+    { path: "test", component: ProjectComponent },
   ];
 }

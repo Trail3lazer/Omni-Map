@@ -1,5 +1,5 @@
 import { Component, OnInit, EventEmitter, Output } from "@angular/core";
-import { ParentMapService } from "src/app/services/parent-map.service";
+import { ProjectService } from "src/app/services/parent-map.service";
 
 @Component({
   selector: "app-start-menu",
@@ -10,7 +10,7 @@ export class StartMenuComponent implements OnInit {
 
   @Output() public projectFile$: EventEmitter<File> = new EventEmitter();
 
-  constructor(private parentMapService: ParentMapService) { }
+  constructor(private projectService: ProjectService) { }
   ngOnInit() {
   }
 

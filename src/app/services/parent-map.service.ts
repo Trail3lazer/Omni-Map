@@ -4,17 +4,17 @@ import { Observable } from "rxjs";
 @Injectable({
   providedIn: "root"
 })
-export class ParentMapService {
-  private parentMap: File;
+export class ProjectService {
+  private project: File;
 
-  public set setParentMap(file$: Observable<File>) {
+  public set setProject(file$: Observable<File>) {
     file$.subscribe(
-      next => this.parentMap = next,
+      next => this.project = next,
       err => console.error(err)
     );
   }
 
-  public get getParentMap() {
-    return this.parentMap;
+  public get getProject() {
+    return this.project;
   }
 }
