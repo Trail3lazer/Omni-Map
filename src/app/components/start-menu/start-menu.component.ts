@@ -21,5 +21,4 @@ export class StartMenuComponent implements OnInit {
   public loadProject(event: any): void {
     this.projectFile$.emit(event);
   }
-
 }

@@ -1,0 +1,13 @@
+<div class="contextmenu" [ngStyle]="{'left.px': x, 'top.px': y}">
+    <div class="list-group-flush shadow rounded">
+        <button class="list-group-item list-group-item-action d-flex justify-content-between" (click)="addIcon(x,y,'map')">
+            <div>Sub Map</div><img [src]="map" alt="mapIcon">
+        </button>
+        <button class="list-group-item list-group-item-action d-flex justify-content-between" (click)="addIcon(x,y,'doc')">
+            <div>Document</div><img [src]="doc" alt="docIcon">
+        </button>
+        <button class="list-group-item list-group-item-action d-flex justify-content-between" (click)="addIcon(x,y,'pic')">
+            <div>Picture</div><img [src]="pic" alt="picIcon">
+        </button>
+    </div>
+</div>
