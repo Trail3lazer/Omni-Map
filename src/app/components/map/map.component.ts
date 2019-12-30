@@ -1,6 +1,8 @@
 import { Component, ChangeDetectionStrategy } from "@angular/core";
 import { BehaviorSubject } from "rxjs";
 import { Icon } from "../icon";
+import { ProjectService } from "src/app/services/parent-map.service";
+import { IChild } from "src/app/ichild";
 
 @Component({
   selector: "app-map",
@@ -9,27 +11,29 @@ import { Icon } from "../icon";
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MapComponent {
-  mapPath: string;
+  current: IChild = this.projectService.getTarget;
+  mapPath: string = this.current.path;
   contextmenu = false;
   contextmenuX = 0;
   contextmenuY = 0;
-  coordinateArr: any[] = [];
+  coordinateArr: any[] = this.current.children;
   coordinates$: BehaviorSubject<any[]> = new BehaviorSubject(this.coordinateArr);
 
-  constructor(/*path: string*/) {
-    this.mapPath = `${/*path*/"https://www.1800contacts.com/connect/wp-content/uploads/2013/08/1800contacts-building.jpg"}`;
-  }
+  constructor(private projectService: ProjectService) {}
+
   public mapClick = (event: MouseEvent) => {
-    this.contextmenuX = event.clientX;
-    this.contextmenuY = event.clientY;
+    this.contextmenuX = event.pageX;
+    this.contextmenuY = event.pageY;
     this.contextmenu = true;
   }
+
   public addIcon = (icon: Icon) => {
     this.contextmenu = false;
     this.coordinateArr.push( icon );
     this.coordinates$.next(this.coordinateArr);
   }
+
   public iconClick = (type: string, reference: any) => {
-    
+    console.log(type, " ", reference);
   }
 }

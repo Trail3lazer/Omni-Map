@@ -1,6 +1,6 @@
 import { Component, Input, Output } from "@angular/core";
 import { EventEmitter } from "@angular/core";
-import { Icon } from "../icon";
+import { IPrimitiveChild } from "../iprimitive-child";
 
 @Component({
   selector: "app-contextmenu",
@@ -16,14 +16,13 @@ export class ContextMenuComponent {
 
   @Input() x = 0;
   @Input() y = 0;
-  @Output() newIcon = new EventEmitter<Icon>();
+  @Output() newIcon = new EventEmitter<any>();
 
   addIcon(x: number, y: number, type: string) {
-    const newIcon: Icon = {
+    const newIcon: IPrimitiveChild = {
       location: {left: `${x}px`, top: `${y}px`},
       type,
-      path: this[`${type}`],
-      component: ""
+      iconPath: this[`${type}`],
     };
     this.newIcon.emit(newIcon);
   }

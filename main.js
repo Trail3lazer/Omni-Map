@@ -3,7 +3,7 @@ const { menuBuilder } = require("./application/menu");
 const url = require("url");
 const path = require("path");
 
-let mainWindow: Electron.BrowserWindow;
+let mainWindow;
 
 function createWindow() {
       mainWindow = new BrowserWindow({
