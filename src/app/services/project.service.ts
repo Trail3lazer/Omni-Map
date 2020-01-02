@@ -6,8 +6,8 @@ import { IChild } from "../ichild";
 })
 export class ProjectService {
   private project: IChild = {
-    x: 0,
-    y: 0,
+    location: { left: "0px", top: "0px"},
+    iconPath: "",
     ancestry: [],
     index: 0,
     description: "",

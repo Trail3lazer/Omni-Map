@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 
-import { ParentMapService } from './parent-map.service';
+import { IpcService } from './ipc.service';
 
-describe('ParentMapService', () => {
+describe('IpcService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));
 
   it('should be created', () => {
-    const service: ParentMapService = TestBed.get(ParentMapService);
+    const service: IpcService = TestBed.get(IpcService);
     expect(service).toBeTruthy();
   });
 });

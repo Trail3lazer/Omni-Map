@@ -2,6 +2,7 @@ const {app, BrowserWindow} = require("electron");
 const { menuBuilder } = require("./application/menu");
 const url = require("url");
 const path = require("path");
+const listener = require("./electronServices/fsProjectService")
 
 let mainWindow;
 
@@ -14,6 +15,8 @@ function createWindow() {
         }
       });
 
+      listener()
+
       mainWindow.loadURL(
         url.format({
           pathname: path.join(__dirname, `/dist/index.html`),
@@ -21,6 +24,9 @@ function createWindow() {
           slashes: true
         })
       );
+
+      mainWindow.setMenu(menuBuilder());
+
       // Open the DevTools.
       mainWindow.webContents.openDevTools();
 

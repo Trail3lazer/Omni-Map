@@ -1,5 +1,5 @@
 import { Component, OnInit, EventEmitter, Output } from "@angular/core";
-import { ProjectService } from "src/app/services/parent-map.service";
+import { ProjectService } from "src/app/services/project.service";
 
 @Component({
   selector: "app-start-menu",

@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy } from "@angular/core";
 import { BehaviorSubject } from "rxjs";
 import { Icon } from "../icon";
-import { ProjectService } from "src/app/services/parent-map.service";
+import { ProjectService } from "src/app/services/project.service";
 import { IChild } from "src/app/ichild";
 
 @Component({

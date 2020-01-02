@@ -1,6 +1,6 @@
 const { app, Menu } = require('electron')
 
-exports = function menuBuilder () {
+module.exports = function menuBuilder () {
 
     const isMac = process.platform === 'darwin';
 
@@ -103,5 +103,5 @@ exports = function menuBuilder () {
     ];
 
     const menu = Menu.buildFromTemplate(template);
-    return Menu.setApplicationMenu(menu);
+    return menu
 };

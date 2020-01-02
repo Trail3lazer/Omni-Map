@@ -1,6 +1,8 @@
 import { Component, Input, Output } from "@angular/core";
 import { EventEmitter } from "@angular/core";
 import { IPrimitiveChild } from "../iprimitive-child";
+import { DialogService } from "src/app/services/dialog.service";
+import { dialog } from "electron";
 
 @Component({
   selector: "app-contextmenu",
@@ -12,13 +14,14 @@ export class ContextMenuComponent {
   doc = "assets/icons8-document-64.png";
   pic = "assets/icons8-camera-64.png";
 
-  constructor() { }
+  constructor(private dialogService: DialogService) { }
 
   @Input() x = 0;
   @Input() y = 0;
   @Output() newIcon = new EventEmitter<any>();
 
-  addIcon(x: number, y: number, type: string) {
+  public async addIcon(x: number, y: number, type: string) {
+    this.dialogService.selectDir();
     const newIcon: IPrimitiveChild = {
       location: {left: `${x}px`, top: `${y}px`},
       type,

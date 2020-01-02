@@ -1,24 +1,20 @@
 import { Injectable } from "@angular/core";
-import * as fs from "fs";
-import { app } from "electron";
-import { ProjectService } from "./parent-map.service";
+import { ProjectService } from "./project.service";
+import { DialogService } from "./dialog.service";
 
 @Injectable({
-  providedIn: "root"
+    providedIn: "root"
 })
 export class StorageService {
+    private projectDirectory: string;
 
-  private currentPath = app.getPath("appData");
-
-  constructor(
-    private projectService: ProjectService
+    constructor(
+        private projectService: ProjectService,
+        private dialogService: DialogService
     ) { }
 
-  public saveTree() {
-    fs.writeFile(
-      this.currentPath + "/projectTree.file",
-      JSON.stringify(this.projectService.getTarget),
-      err => console.log(err)
-    );
-  }
+
+    public saveTree() {
+
+    }
 }
