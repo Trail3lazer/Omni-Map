@@ -1,6 +1,6 @@
 const fs = require("fs");
 const { dialog, ipcMain, app } = require("electron");
-let directory = app.getPath("documents")+"/untitled-map/";
+let directory = `file://${app.getPath("documents")}/untitled-map/`;
 
 
 const getFileName = (str) => {
@@ -17,7 +17,7 @@ module.exports = function listener() {
             }
         ).then(actual => {
             if (actual.filePaths.length > 0) {
-                directory = actual.filePaths[0];
+                directory = `file://${actual.filePaths[0]}/untitled-map/`;
                 event.reply("select working dir", actual.filePaths[0])
             } else {
                 console.log("no paths returned")

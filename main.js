@@ -1,5 +1,5 @@
 const {app, BrowserWindow} = require("electron");
-const { menuBuilder } = require("./application/menu");
+const menuBuilder = require("./application/menu");
 const url = require("url");
 const path = require("path");
 const listener = require("./electronServices/fsProjectService")
@@ -25,7 +25,7 @@ function createWindow() {
         })
       );
 
-      mainWindow.setMenu(menuBuilder());
+     // mainWindow.setMenu(menuBuilder());
 
       // Open the DevTools.
       mainWindow.webContents.openDevTools();

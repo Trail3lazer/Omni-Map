@@ -13,7 +13,7 @@ export class ProjectService {
     description: "",
     name: "Middle Earth",
     type: "map",
-    path: "https://i.pinimg.com/originals/99/93/72/9993727dc7fa3809427d5f4e9eef88a4.jpg",
+    path: "file:///C:/Users/jwight1/Pictures/Screenshots/Screenshot (6).png",
     children: []
   };
   private targetObject = this.project;
