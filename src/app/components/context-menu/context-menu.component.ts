@@ -2,7 +2,6 @@ import { Component, Input, Output } from "@angular/core";
 import { EventEmitter } from "@angular/core";
 import { IPrimitiveChild } from "../iprimitive-child";
 import { DialogService } from "src/app/services/dialog.service";
-import { dialog } from "electron";
 
 @Component({
   selector: "app-contextmenu",
@@ -21,12 +20,22 @@ export class ContextMenuComponent {
   @Output() newIcon = new EventEmitter<any>();
 
   public async addIcon(x: number, y: number, type: string) {
-    this.dialogService.selectDir();
-    const newIcon: IPrimitiveChild = {
-      location: {left: `${x}px`, top: `${y}px`},
-      type,
-      iconPath: this[`${type}`],
-    };
-    this.newIcon.emit(newIcon);
+    let newChild: IPrimitiveChild;
+    if (type === "doc") {this.dialogService.selectDir(); }
+    if (type === "pic") {this.dialogService.newProject(); }
+    this.dialogService.importFile().subscribe(
+      next => {
+        const response = next[1];
+        console.log(response);
+        newChild = {
+          location: {left: `${x}px`, top: `${y}px`},
+          type,
+          iconPath: this[`${type}`],
+          path: response.path,
+          name: response.name
+        };
+        this.newIcon.emit(newChild);
+      },
+    ).unsubscribe();
   }
 }

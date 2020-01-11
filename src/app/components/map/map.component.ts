@@ -1,8 +1,9 @@
-import { Component, ChangeDetectionStrategy } from "@angular/core";
-import { BehaviorSubject } from "rxjs";
-import { Icon } from "../icon";
+import { Component, ChangeDetectionStrategy, EventEmitter } from "@angular/core";
+import { BehaviorSubject, Observable } from "rxjs";
+import { tap } from "rxjs/operators";
 import { ProjectService } from "src/app/services/project.service";
 import { IChild } from "src/app/ichild";
+import { IPrimitiveChild } from "../iprimitive-child";
 
 @Component({
   selector: "app-map",
@@ -11,15 +12,23 @@ import { IChild } from "src/app/ichild";
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MapComponent {
-  current: IChild = this.projectService.getTarget;
-  mapPath: string = this.current.path;
-  contextmenu = false;
-  contextmenuX = 0;
-  contextmenuY = 0;
-  coordinateArr: any[] = this.current.children;
-  coordinates$: BehaviorSubject<any[]> = new BehaviorSubject(this.coordinateArr);
+  public contextmenu = false;
+  public contextmenuX = 0;
+  public contextmenuY = 0;
 
-  constructor(private projectService: ProjectService) {}
+  private childArr: any[];
+  public coordinates$: BehaviorSubject<any[]> = new BehaviorSubject(this.childArr);
+
+  public current$ = new EventEmitter();
+
+  constructor(private projectService: ProjectService) {
+    this.projectService.targetObject$.subscribe(
+      (current: IChild) => {
+        this.current$.emit(current);
+        this.childArr = current.children;
+      }
+    );
+  }
 
   public mapClick = (event: MouseEvent) => {
     this.contextmenuX = event.pageX;
@@ -27,13 +36,15 @@ export class MapComponent {
     this.contextmenu = true;
   }
 
-  public addIcon = (icon: Icon) => {
+  public addIcon = (icon: IPrimitiveChild) => {
     this.contextmenu = false;
-    this.coordinateArr.push( icon );
-    this.coordinates$.next(this.coordinateArr);
+    this.projectService.addChild(icon);
+    this.coordinates$.next(this.childArr);
   }
 
-  public iconClick = (type: string, reference: any) => {
-    console.log(type, " ", reference);
+  public iconClick = (type: string, childIndex: any) => {
+    if (type === "map") {
+      this.projectService.selectChild(childIndex);
+    }
   }
 }

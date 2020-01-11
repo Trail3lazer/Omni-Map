@@ -1,5 +1,5 @@
 export interface IChild {
-    location: {left: string, top: string}
+    location: {left: string, top: string};
     ancestry: number[];
     type: string;
     children: any[];

@@ -6,7 +6,8 @@ import { StartMenuComponent } from "./components/start-menu/start-menu.component
 import { ProjectComponent } from "./project/project.component";
 import { RouterModule } from "@angular/router";
 import { MapComponent } from "./components/map/map.component";
-import { ContextMenuComponent } from './components/context-menu/context-menu.component';
+import { ContextMenuComponent } from "./components/context-menu/context-menu.component";
+import { LocalPipe } from "./local.pipe";
 
 @NgModule({
   declarations: [
@@ -14,7 +15,8 @@ import { ContextMenuComponent } from './components/context-menu/context-menu.com
     StartMenuComponent,
     ProjectComponent,
     MapComponent,
-    ContextMenuComponent
+    ContextMenuComponent,
+    LocalPipe
   ],
   imports: [BrowserModule, AppRoutingModule, RouterModule],
   providers: [],

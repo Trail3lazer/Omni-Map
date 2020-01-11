@@ -1,5 +1,7 @@
 import { Injectable } from "@angular/core";
 import { IChild } from "../ichild";
+import { IPrimitiveChild } from "../components/iprimitive-child";
+import { BehaviorSubject } from "rxjs";
 
 @Injectable({
   providedIn: "root"
@@ -13,10 +15,13 @@ export class ProjectService {
     description: "",
     name: "Middle Earth",
     type: "map",
-    path: "file:///C:/Users/jwight1/Pictures/Screenshots/Screenshot (6).png",
+    path: "C:/Users/jwight1/Pictures/Screenshots/Screenshot (6).png",
     children: []
   };
-  private targetObject = this.project;
+  private targetObject: IChild = this.project;
+  public targetObject$: BehaviorSubject<IChild> = new BehaviorSubject(this.targetObject);
+
+  constructor() {}
 
   public traverseTree(arr: number[]) {
     this.targetObject = this.project;
@@ -27,13 +32,24 @@ export class ProjectService {
 
   public selectChild(idx: number) {
     this.targetObject = this.targetObject.children[ idx ];
+    this.targetObject$.next(this.targetObject);
   }
 
-  public addChild(child: IChild) {
-    child.index = this.targetObject.children.length;
-    child.ancestry = this.targetObject.ancestry;
-    child.ancestry.push(child.index);
+  public addChild(primitive: IPrimitiveChild) {
+    const child: IChild = {
+      index: this.targetObject.children.length,
+      ancestry: [],
+      children: [],
+      description: "",
+      iconPath: primitive.iconPath,
+      location: primitive.location,
+      name: primitive.name,
+      path: primitive.path,
+      type: primitive.type
+    };
+    child.ancestry = this.targetObject.ancestry.concat([child.index]);
     this.targetObject.children.push(child);
+    console.log(this.targetObject);
   }
 
   public updateTarget(key: string, value: any) {
@@ -42,9 +58,5 @@ export class ProjectService {
 
   public removeChild(child: IChild) {
     delete this.targetObject.children[child.index];
-  }
-
-  public get getTarget() {
-    return this.targetObject;
   }
 }

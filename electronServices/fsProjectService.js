@@ -1,6 +1,6 @@
 const fs = require("fs");
 const { dialog, ipcMain, app } = require("electron");
-let directory = `file://${app.getPath("documents")}/untitled-map/`;
+let directory = `${app.getPath("documents")}/untitled-map/`;
 
 
 const getFileName = (str) => {
@@ -17,7 +17,7 @@ module.exports = function listener() {
             }
         ).then(actual => {
             if (actual.filePaths.length > 0) {
-                directory = `file://${actual.filePaths[0]}/untitled-map/`;
+                directory = `${actual.filePaths[0]}`;
                 event.reply("select working dir", actual.filePaths[0])
             } else {
                 console.log("no paths returned")
@@ -25,7 +25,26 @@ module.exports = function listener() {
         }).catch(err => console.log(err))
     });
 
-    ipcMain.on("import file", () => {
+    ipcMain.on("import file", event => {
+        dialog.showOpenDialog(
+            {
+                title: "Select file to import to project",
+                buttonLabel: "Attach",
+                properties: ["openFile"],
+            }
+        ).then(actual => {
+            if (actual.filePaths.length > 0) {
+                event.reply("import file", {
+                    fileName: getFileName(actual.filePaths[0]),
+                    path: actual.filePaths[0]
+                })
+            } else {
+                console.log("no paths returned")
+            }
+        }).catch(err => console.log(err))
+    });
+
+    ipcMain.on("save file", () => {
         dialog.showOpenDialog(
             {
                 title: "Select file to import to project",
@@ -47,14 +66,16 @@ module.exports = function listener() {
             properties: ["createDirectory", "promptToCreate"],
             title: "New project",
             buttonLabel: "Create",
-            defaultPath: app.getPath("documents")+"/untitled-map/"
+            defaultPath: app.getPath("documents")+"\\omni-map\\"
         }).then(actual => {
             if (actual.filePaths.length > 0) {
                 directory = actual.filePaths[0];
                 event.reply("new project", actual.filePaths[0])
             } else {
-                console.log("new project")
+                fs.mkdir(`${app.getPath("documents")}\\omni-map\\`);
+                directory = `${app.getPath("documents")}\\omni-map\\`;
             }
         }).catch(err => console.log(err))
     })
+
 }
