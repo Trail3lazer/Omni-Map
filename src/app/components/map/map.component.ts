@@ -1,19 +1,20 @@
-import { Component, EventEmitter, OnInit, ChangeDetectionStrategy } from "@angular/core";
+import { Component, OnInit, ChangeDetectionStrategy } from "@angular/core";
 import { ProjectService } from "src/app/services/project.service";
-import { IChild } from "src/app/ichild";
+import { IChild } from "src/app/components/ichild";
 import { BehaviorSubject } from "rxjs";
 
 @Component({
   selector: "app-map",
   templateUrl: "./map.component.html",
   styleUrls: ["./map.component.css"],
-  // changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MapComponent implements OnInit {
   public contextmenu = false;
   public contextmenuX = 0;
   public contextmenuY = 0;
   public targetObj$: BehaviorSubject<IChild> = this.projectService.targetObject$;
+  public newFileForm = true;
 
   constructor(private projectService: ProjectService) { }
 

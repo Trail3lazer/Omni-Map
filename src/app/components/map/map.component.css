@@ -7,3 +7,9 @@
 .map {
     z-index: -5;
 }
+
+.newFileForm {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+}

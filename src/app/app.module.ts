@@ -7,6 +7,7 @@ import { RouterModule } from "@angular/router";
 import { MapComponent } from "./components/map/map.component";
 import { ContextMenuComponent } from "./components/context-menu/context-menu.component";
 import { LocalPipe } from "./local.pipe";
+import { NewFileFormComponent } from './components/new-file-form/new-file-form.component';
 
 @NgModule({
   declarations: [
@@ -14,7 +15,8 @@ import { LocalPipe } from "./local.pipe";
     StartMenuComponent,
     MapComponent,
     ContextMenuComponent,
-    LocalPipe
+    LocalPipe,
+    NewFileFormComponent
   ],
   imports: [BrowserModule, AppRoutingModule, RouterModule],
   providers: [],

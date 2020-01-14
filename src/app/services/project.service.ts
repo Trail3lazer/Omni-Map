@@ -1,5 +1,5 @@
 import { Injectable, EventEmitter } from "@angular/core";
-import { IChild } from "../ichild";
+import { IChild } from "../components/ichild";
 import { IPrimitiveChild } from "../components/iprimitive-child";
 import { BehaviorSubject } from "rxjs";
 

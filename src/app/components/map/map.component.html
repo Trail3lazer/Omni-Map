@@ -1,5 +1,8 @@
 <div *ngIf="targetObj$ | async as target">
   <img class="map" [src]="target.path | local" (click)="mapClick($event)" />
+  <div *ngIf="newFileForm" class="newFileForm w-100 h-100 d-flex justify-content-center">
+    <app-new-file-form></app-new-file-form>
+  </div>
   <div *ngIf="contextmenu">
     <app-contextmenu
       (closeMenu)="closeMenu($event)"
