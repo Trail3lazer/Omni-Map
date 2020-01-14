@@ -1,34 +1,23 @@
-import { Component, ChangeDetectionStrategy, EventEmitter } from "@angular/core";
-import { BehaviorSubject, Observable } from "rxjs";
-import { tap } from "rxjs/operators";
+import { Component, EventEmitter, OnInit, ChangeDetectionStrategy } from "@angular/core";
 import { ProjectService } from "src/app/services/project.service";
 import { IChild } from "src/app/ichild";
-import { IPrimitiveChild } from "../iprimitive-child";
+import { BehaviorSubject } from "rxjs";
 
 @Component({
   selector: "app-map",
   templateUrl: "./map.component.html",
   styleUrls: ["./map.component.css"],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  // changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class MapComponent {
+export class MapComponent implements OnInit {
   public contextmenu = false;
   public contextmenuX = 0;
   public contextmenuY = 0;
+  public targetObj$: BehaviorSubject<IChild> = this.projectService.targetObject$;
 
-  private childArr: any[];
-  public coordinates$: BehaviorSubject<any[]> = new BehaviorSubject(this.childArr);
+  constructor(private projectService: ProjectService) { }
 
-  public current$ = new EventEmitter();
-
-  constructor(private projectService: ProjectService) {
-    this.projectService.targetObject$.subscribe(
-      (current: IChild) => {
-        this.current$.emit(current);
-        this.childArr = current.children;
-      }
-    );
-  }
+  ngOnInit() {}
 
   public mapClick = (event: MouseEvent) => {
     this.contextmenuX = event.pageX;
@@ -36,10 +25,8 @@ export class MapComponent {
     this.contextmenu = true;
   }
 
-  public addIcon = (icon: IPrimitiveChild) => {
+  public closeMenu = () => {
     this.contextmenu = false;
-    this.projectService.addChild(icon);
-    this.coordinates$.next(this.childArr);
   }
 
   public iconClick = (type: string, childIndex: any) => {

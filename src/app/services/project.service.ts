@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core";
+import { Injectable, EventEmitter } from "@angular/core";
 import { IChild } from "../ichild";
 import { IPrimitiveChild } from "../components/iprimitive-child";
 import { BehaviorSubject } from "rxjs";
@@ -19,9 +19,9 @@ export class ProjectService {
     children: []
   };
   private targetObject: IChild = this.project;
-  public targetObject$: BehaviorSubject<IChild> = new BehaviorSubject(this.targetObject);
+  public targetObject$: BehaviorSubject<IChild> = new BehaviorSubject<IChild>(this.targetObject);
 
-  constructor() {}
+  constructor() { }
 
   public traverseTree(arr: number[]) {
     this.targetObject = this.project;
@@ -49,7 +49,7 @@ export class ProjectService {
     };
     child.ancestry = this.targetObject.ancestry.concat([child.index]);
     this.targetObject.children.push(child);
-    console.log(this.targetObject);
+    this.emitTarget();
   }
 
   public updateTarget(key: string, value: any) {
@@ -58,5 +58,10 @@ export class ProjectService {
 
   public removeChild(child: IChild) {
     delete this.targetObject.children[child.index];
+  }
+
+  public emitTarget() {
+    this.targetObject$.next(this.targetObject);
+    console.info("Emitted", this.targetObject);
   }
 }

@@ -1,10 +1,20 @@
-<img *ngIf="current.path | async as path" class="map" [src]="path | local" (click)="mapClick($event)">
-<div *ngIf="contextmenu">
-    <app-contextmenu (newIcon)="addIcon($event)" [x]="contextmenuX" [y]="contextmenuY"></app-contextmenu>
-</div>
-<div *ngFor="let point of coordinates$ | async">
-    <img [ngStyle]="point.location"
-        [src]="point.iconPath" 
-        class="icon {{point.type + 'Icon'}}"
-        (click)="iconClick(point.type, point.index)">
+<div *ngIf="targetObj$ | async as target">
+  <img class="map" [src]="target.path | local" (click)="mapClick($event)" />
+  <div *ngIf="contextmenu">
+    <app-contextmenu
+      (closeMenu)="closeMenu($event)"
+      [x]="contextmenuX"
+      [y]="contextmenuY"
+    ></app-contextmenu>
+  </div>
+  <div *ngIf="target.children">
+    <div *ngFor="let child of target.children">
+      <img
+        [ngStyle]="child.location"
+        [src]="child.iconPath"
+        class="icon {{ child.type + 'Icon' }}"
+        (click)="iconClick(child.type, child.index)"
+      />
+    </div>
+  </div>
 </div>
