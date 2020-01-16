@@ -1,3 +1,59 @@
-<div class="formHolder container col-12 col-lg-6 shadow">
-    <input type="text" name="form" class="form-control">
+<div class="formHolder p-3 w-100 col-12 shadow">
+  <form [formGroup]="info" class="form-group">
+    <div class="form-group">
+      <label for="nameControl">
+        Name:
+      </label>
+      <input
+        required
+        type="text"
+        formControlName="name"
+        name="nameControl"
+        class="form-control"
+        placeholder="Odysseus"
+      />
+    </div>
+    <div class="form-group row">
+      <label for="displayNameControl"class="col-10">
+        Display name?
+      </label>
+      <input
+        type="checkbox"
+        formControlName="displayName"
+        name="displayNameControl"
+        class="form-control col-1 m-0 p-0"
+      />
+    </div>
+    <div class="form-group row">
+      <button
+        (click)="selectFile()"
+        class="btn btn-outline-light col-4 m-2"
+        type="button"
+      >Choose File</button>
+      <div class="container">
+        {{ filePath }}
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="descriptionControl">
+        Description:
+      </label>
+      <textarea
+        type="text"
+        formControlName="description"
+        name="descriptionControl"
+        class="form-control"
+        rows="5"
+        placeholder="Odysseus was a legendary hero in Greek mythology, king of the..."
+      ></textarea>
+    </div>
+    <div class="form-group">
+      <input
+        type="submit"
+        class="btn btn-outline-light form-control"
+        value="Submit"
+        (click)="submitClicked()"
+      >
+    </div>
+  </form>
 </div>

@@ -1,4 +1,14 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, EventEmitter, Output, Input, ChangeDetectionStrategy, ChangeDetectorRef } from "@angular/core";
+import { FormGroup, FormControl } from "@angular/forms";
+import { DialogService } from "src/app/services/dialog.service";
+import { map } from "rxjs/operators";
+import { Subject } from "rxjs";
+
+export interface INewFileFormValues {
+  name: string;
+  description: string;
+  path: string;
+}
 
 @Component({
   selector: "app-new-file-form",
@@ -6,10 +16,41 @@ import { Component, OnInit } from "@angular/core";
   styleUrls: ["./new-file-form.component.css"]
 })
 export class NewFileFormComponent implements OnInit {
+  @Input() public showForm: boolean;
+  @Output() public formValue$ = new EventEmitter<INewFileFormValues>();
 
-  constructor() { }
+  public info: FormGroup = new FormGroup({
+    name: new FormControl(""),
+    displayName: new FormControl(false),
+    description: new FormControl(""),
+    type: new FormControl("")
+  });
+
+  public filePath = "";
+  private get formValue() {
+    return {
+      ...this.info.value,
+      path: this.filePath
+    };
+  }
+
+  constructor(
+    private dialogService: DialogService,
+    private changeDirector: ChangeDetectorRef
+) { }
 
   ngOnInit() {
   }
 
+  public selectFile() {
+    this.dialogService.importFile().subscribe(
+      arr => {
+        this.filePath = arr[1].path;
+        setTimeout( () => this.changeDirector.markForCheck(), 500);
+      });
+  }
+
+  public submitClicked() {
+    this.formValue$.emit(this.formValue);
+  }
 }

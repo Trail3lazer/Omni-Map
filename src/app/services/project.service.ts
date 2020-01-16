@@ -1,14 +1,18 @@
 import { Injectable, EventEmitter } from "@angular/core";
 import { IChild } from "../components/ichild";
-import { IPrimitiveChild } from "../components/iprimitive-child";
-import { BehaviorSubject } from "rxjs";
+import { BehaviorSubject, combineLatest, Observable } from "rxjs";
+import { take, tap } from "rxjs/operators";
+import { DialogService, IFilePaths } from "./dialog.service";
+import { INewFileFormValues } from "../components/new-file-form/new-file-form.component";
+import { Event } from "electron";
+import { IPrimitive } from "../components/iprimitive-child";
 
 @Injectable({
   providedIn: "root"
 })
 export class ProjectService {
   private project: IChild = {
-    location: { left: "0px", top: "0px"},
+    location: { left: "0px", top: "0px" },
     iconPath: "",
     ancestry: [],
     index: 0,
@@ -21,35 +25,49 @@ export class ProjectService {
   private targetObject: IChild = this.project;
   public targetObject$: BehaviorSubject<IChild> = new BehaviorSubject<IChild>(this.targetObject);
 
-  constructor() { }
+  public mapIcon = __dirname + "/assets/icons8-map-64.png";
+  public docIcon = __dirname + "/assets/icons8-document-64.png";
+  public picIcon = __dirname + "/assets/icons8-camera-64.png";
+
+  constructor(
+    private dialogService: DialogService
+  ) { }
 
   public traverseTree(arr: number[]) {
     this.targetObject = this.project;
     for (const idx of arr) {
-      this.targetObject = this.targetObject.children[ arr[idx] ];
+      this.targetObject = this.targetObject.children[arr[idx]];
     }
   }
 
   public selectChild(idx: number) {
-    this.targetObject = this.targetObject.children[ idx ];
+    this.targetObject = this.targetObject.children[idx];
     this.targetObject$.next(this.targetObject);
   }
 
-  public addChild(primitive: IPrimitiveChild) {
-    const child: IChild = {
-      index: this.targetObject.children.length,
-      ancestry: [],
-      children: [],
-      description: "",
-      iconPath: primitive.iconPath,
-      location: primitive.location,
-      name: primitive.name,
-      path: primitive.path,
-      type: primitive.type
-    };
-    child.ancestry = this.targetObject.ancestry.concat([child.index]);
-    this.targetObject.children.push(child);
-    this.emitTarget();
+  public addChild(formValue$: EventEmitter<INewFileFormValues>, context$: EventEmitter<IPrimitive>) {
+    combineLatest(context$, formValue$)
+    .pipe(take(1))
+    .subscribe(
+      (latest: [ IPrimitive, INewFileFormValues ]) => {
+        const formValue: INewFileFormValues = latest[1];
+        const context: IPrimitive = latest[0];
+        const child: IChild = {
+          index: this.targetObject.children.length,
+          ancestry: [],
+          children: [],
+          description: formValue.description,
+          iconPath: this[`${context.type}Icon`],
+          location: context.location,
+          name: formValue.name,
+          path: formValue.path,
+          type: context.type
+        };
+        child.ancestry = this.targetObject.ancestry.concat([child.index]);
+        this.targetObject.children.push(child);
+        this.emitTarget();
+      },
+    );
   }
 
   public updateTarget(key: string, value: any) {

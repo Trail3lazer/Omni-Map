@@ -1,20 +1,20 @@
 <div *ngIf="targetObj$ | async as target">
   <img class="map" [src]="target.path | local" (click)="mapClick($event)" />
   <div *ngIf="newFileForm" class="newFileForm w-100 h-100 d-flex justify-content-center">
-    <app-new-file-form></app-new-file-form>
+    <app-new-file-form class="w-50" (formValue$)="closeForm($event)"></app-new-file-form>
   </div>
-  <div *ngIf="contextmenu">
+  <div *ngIf="contextmenu.x">
     <app-contextmenu
-      (closeMenu)="closeMenu($event)"
-      [x]="contextmenuX"
-      [y]="contextmenuY"
+      (typeClicked$)="closeContextMenu($event)"
+      [x]="contextmenu.x"
+      [y]="contextmenu.y"
     ></app-contextmenu>
   </div>
   <div *ngIf="target.children">
     <div *ngFor="let child of target.children">
       <img
         [ngStyle]="child.location"
-        [src]="child.iconPath"
+        [src]="child.iconPath | local"
         class="icon {{ child.type + 'Icon' }}"
         (click)="iconClick(child.type, child.index)"
       />

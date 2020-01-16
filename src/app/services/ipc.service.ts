@@ -1,7 +1,5 @@
-import { Injectable } from "@angular/core";
-import { IpcRenderer, ipcRenderer, IpcRendererEvent } from "electron";
-import { bindCallback, Observable, fromEvent, Subject } from "rxjs";
-import { EventEmitter } from "protractor";
+import { Injectable, EventEmitter } from "@angular/core";
+import { IpcRenderer, IpcRendererEvent } from "electron";
 
 @Injectable({
   providedIn: "root"
@@ -21,11 +19,11 @@ export class IpcService {
     }
   }
 
-  public on(channel: string): Subject<[IpcRendererEvent, any]> {
+  public on(channel: string): EventEmitter<[IpcRendererEvent, any]> {
     if (!this.ipc) {
       return;
     }
-    const ipcResponse: Subject<[IpcRendererEvent, any]> = new Subject();
+    const ipcResponse: EventEmitter<[IpcRendererEvent, any]> = new EventEmitter();
     this.ipc.on(channel, (event, anything) => {
       ipcResponse.next([event, anything]);
     });
