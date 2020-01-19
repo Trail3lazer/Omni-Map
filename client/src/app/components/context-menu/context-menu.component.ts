@@ -10,9 +10,9 @@ import { ProjectService } from "src/app/services/project.service";
 })
 export class ContextMenuComponent {
 
-  public map = this.projectService.mapIcon;
-  public doc = this.projectService.docIcon;
-  public pic = this.projectService.picIcon;
+  public map = this.projectService.Icons.mapIcon;
+  public doc = this.projectService.Icons.docIcon;
+  public pic = this.projectService.Icons.picIcon;
 
 
   @Input() x = 0;

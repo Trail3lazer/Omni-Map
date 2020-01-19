@@ -1,9 +1,14 @@
 <div *ngIf="targetObj$ | async as target">
+  <img *ngIf="!targetIsRoot()" class="upArrow" [src]="upArrow | local" (click)="moveUpTree()">
   <img class="map" [src]="target.path | local" (click)="mapClick($event)" />
-  <div *ngIf="newFileForm" class="newFileForm w-100 h-100 d-flex justify-content-center">
-    <app-new-file-form class="w-50" (formValue$)="closeForm($event)"></app-new-file-form>
+
+  <div *ngIf="newFileForm"
+  class="newFileForm">
+    <app-new-file-form
+    (formValue$)="closeForm($event)">
+  </app-new-file-form>
   </div>
-  <div *ngIf="contextmenu.x">
+  <div *ngIf="showContextMenu">
     <app-contextmenu
       (typeClicked$)="closeContextMenu($event)"
       [x]="contextmenu.x"

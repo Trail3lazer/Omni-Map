@@ -1,8 +1,6 @@
-import { Component, OnInit, EventEmitter, Output, Input, ChangeDetectionStrategy, ChangeDetectorRef } from "@angular/core";
+import { Component, EventEmitter, Output, Input, ChangeDetectionStrategy, ChangeDetectorRef } from "@angular/core";
 import { FormGroup, FormControl } from "@angular/forms";
 import { DialogService } from "src/app/services/dialog.service";
-import { map } from "rxjs/operators";
-import { Subject } from "rxjs";
 
 export interface INewFileFormValues {
   name: string;
@@ -15,7 +13,7 @@ export interface INewFileFormValues {
   templateUrl: "./new-file-form.component.html",
   styleUrls: ["./new-file-form.component.css"]
 })
-export class NewFileFormComponent implements OnInit {
+export class NewFileFormComponent {
   @Input() public showForm: boolean;
   @Output() public formValue$ = new EventEmitter<INewFileFormValues>();
 
@@ -38,9 +36,6 @@ export class NewFileFormComponent implements OnInit {
     private dialogService: DialogService,
     private changeDirector: ChangeDetectorRef
 ) { }
-
-  ngOnInit() {
-  }
 
   public selectFile() {
     this.dialogService.importFile().subscribe(

@@ -1,17 +1,16 @@
 {
-  "name": "the-creation",
+  "name": "omni-map",
   "version": "0.0.0",
-  "main": "main.js",
+  "main": "main.ts",
   "scripts": {
     "ng": "ng",
-    "start": "nodemon --watch * --exec npm run electron-start",
-    "build": "ng build --base-href ./",
+    "watch": "tsc -w",
+    "build": "ng build --base-href ./ && tsc",
+    "start": "concurrently \"npm run build\" \"nodemon --watch * --exec npm run electron-start\"",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "electron-start": "electron .",
-    "electron": "nodemon --watch * --exec npm run electron-start",
-    "angular": "nodemon --watch * --exec concurrently \"npm run build\" \"npm run electron-start\""
+    "electron-start": "electron ./dist/out-tsc/main.js"
   },
   "private": true,
   "dependencies": {
@@ -25,8 +24,6 @@
     "@angular/router": "~8.2.14",
     "@types/bootstrap": "^4.3.1",
     "bootstrap": "^4.4.1",
-    "concurrently": "^5.0.2",
-    "nodemon": "^2.0.2",
     "rxjs": "~6.4.0",
     "tslib": "^1.10.0",
     "zone.js": "~0.9.1"
@@ -40,7 +37,6 @@
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "~8.9.4",
     "codelyzer": "^5.0.0",
-    "electron": "^7.1.4",
     "jasmine-core": "~3.4.0",
     "jasmine-spec-reporter": "~4.2.1",
     "karma": "~4.1.0",

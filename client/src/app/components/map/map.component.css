@@ -1,0 +1,22 @@
+.icon {
+    position: absolute;
+    height: 20px;
+    z-index: 0;
+}
+
+.map {
+    z-index: -5;
+}
+
+.newFileForm {
+    position: fixed;
+    z-index: 1;
+    top: 5vw;
+    left: calc(50vw - 150px);
+}
+
+.upArrow {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+}

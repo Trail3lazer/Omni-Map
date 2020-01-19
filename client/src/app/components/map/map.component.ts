@@ -4,7 +4,6 @@ import { IChild } from "src/app/components/ichild";
 import { BehaviorSubject } from "rxjs";
 import { INewFileFormValues } from "../new-file-form/new-file-form.component";
 import { IPrimitive } from "../iprimitive-child";
-import { startWith } from "rxjs/operators";
 
 @Component({
   selector: "app-map",
@@ -12,22 +11,25 @@ import { startWith } from "rxjs/operators";
   styleUrls: ["./map.component.css"],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class MapComponent implements OnInit {
+export class MapComponent {
   public contextmenu: { x: number, y: number } = { x: 0, y: 0 };
+  public showContextMenu = false;
   public contextMenuValue$ = new EventEmitter();
   public newFileForm = false;
   public newFileFormValue$ = new EventEmitter();
   public targetObj$: BehaviorSubject<IChild> = this.projectService.targetObject$;
+  public upArrow: string = this.projectService.Icons.upArrowIcon;
 
   constructor(private projectService: ProjectService) { }
 
-  ngOnInit() {}
+  public targetIsRoot(): boolean { return this.projectService.targetIsRoot(); }
 
   public mapClick = (event: MouseEvent) => {
     this.contextmenu = {
       x: event.pageX,
       y: event.pageY
     };
+    this.showContextMenu = true;
   }
 
   public closeForm(values: INewFileFormValues) {
@@ -36,11 +38,8 @@ export class MapComponent implements OnInit {
   }
 
   public closeContextMenu = (context: IPrimitive) => {
+    this.showContextMenu = false;
     this.newFileForm = true;
-    this.contextmenu = {
-      x: 0,
-      y: 0
-    };
     this.projectService.addChild(this.newFileFormValue$, this.contextMenuValue$);
     this.contextMenuValue$.emit(context);
   }
@@ -50,5 +49,9 @@ export class MapComponent implements OnInit {
       if (this.newFileForm) {this.newFileForm = false; }
       this.projectService.selectChild(childIndex);
     }
+  }
+
+  public moveUpTree() {
+    this.projectService.setParentAsTarget();
   }
 }

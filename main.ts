@@ -1,8 +1,7 @@
-const {app, BrowserWindow} = require("electron");
+const { app, BrowserWindow} = require("electron");
 const menuBuilder = require("./application/menu");
 const url = require("url");
 const path = require("path");
-const listener = require("./electronServices/fsProjectService")
 
 let mainWindow;
 
@@ -14,8 +13,6 @@ function createWindow() {
           nodeIntegration: true
         }
       });
-
-      listener()
 
       mainWindow.loadURL(
         url.format({
@@ -30,6 +27,8 @@ function createWindow() {
       // Open the DevTools.
       mainWindow.webContents.openDevTools();
 
+      require("./application/fsProjectService")(app);
+
       mainWindow.on("closed", () => {
         mainWindow = null;
       });
@@ -42,6 +41,5 @@ app.on("window-all-closed", () => {
     });
 
 app.on("activate", () => {
-      menuBuilder();
       if (mainWindow === null) { createWindow(); }
     });
