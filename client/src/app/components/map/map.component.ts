@@ -11,7 +11,7 @@ import { IPrimitive } from "../iprimitive-child";
   styleUrls: ["./map.component.css"],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class MapComponent {
+export class MapComponent implements OnInit {
   public contextmenu: { x: number, y: number } = { x: 0, y: 0 };
   public showContextMenu = false;
   public contextMenuValue$ = new EventEmitter();
@@ -21,6 +21,10 @@ export class MapComponent {
   public upArrow: string = this.projectService.Icons.upArrowIcon;
 
   constructor(private projectService: ProjectService) { }
+
+  ngOnInit() {
+    this.projectService.listenForSave();
+  }
 
   public targetIsRoot(): boolean { return this.projectService.targetIsRoot(); }
 

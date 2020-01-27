@@ -39,8 +39,9 @@ export class NewFileFormComponent {
 
   public selectFile() {
     this.dialogService.importFile().subscribe(
-      arr => {
-        this.filePath = arr[1].path;
+      path => {
+        console.log(path);
+        this.filePath = path;
         setTimeout( () => this.changeDirector.markForCheck(), 500);
       });
   }

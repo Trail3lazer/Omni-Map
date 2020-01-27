@@ -4,6 +4,7 @@ import { BehaviorSubject, combineLatest } from "rxjs";
 import { take } from "rxjs/operators";
 import { INewFileFormValues } from "../components/new-file-form/new-file-form.component";
 import { IPrimitive } from "../components/iprimitive-child";
+import { IpcService } from "./ipc.service";
 
 @Injectable({
   providedIn: "root"
@@ -31,6 +32,14 @@ export class ProjectService {
     picIcon: __dirname + "/assets/icons8-camera-64.png",
     upArrowIcon: __dirname + "/assets/icons8-up-squared-50.png"
   };
+
+  constructor(private ipc: IpcService) {
+    this.ipc.on("newProjectFile")
+    .subscribe(next => {
+      console.log(next);
+      this.project = next;
+    });
+  }
 
   public targetIsRoot(): boolean {
     return this.targetObject.location.left === "0px"
@@ -93,6 +102,10 @@ export class ProjectService {
 
   public emitTarget(): void {
     this.targetObject$.next(this.targetObject);
-    console.info("Emitted", this.targetObject);
+    console.info("Emitted", this.project);
+  }
+
+  public listenForSave() {
+    this.ipc.respondOn("save", "project file", this.project);
   }
 }

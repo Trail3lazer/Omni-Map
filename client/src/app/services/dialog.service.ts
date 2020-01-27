@@ -20,7 +20,7 @@ export class DialogService {
   constructor(private ipc: IpcService) { }
   public directory: Subject<string> = new Subject();
 
-  public importFile(): Observable<[Event, IFilePaths]> {
+  public importFile(): Observable<string> {
     this.ipc.send("import file");
     return this.ipc.on("import file");
   }
