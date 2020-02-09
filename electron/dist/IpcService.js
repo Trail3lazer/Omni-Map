@@ -34,4 +34,10 @@ class IIpcService {
     }
     listenForImportFile() {
         this.ipc.on("import file", event => {
-            DialogService_1.dial
+            DialogService_1.dialogService.selectFile().subscribe(path => {
+                event.reply("import file", path);
+            });
+        });
+    }
+}
+exports.ipc = new IIpcService();

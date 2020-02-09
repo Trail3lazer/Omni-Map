@@ -31,4 +31,4 @@ class IArchiveService {
     }
 }
 exports.IArchiveService = IArchiveService;
-export
+exports.ArchiveService = new IArchiveService();

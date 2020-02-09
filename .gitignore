@@ -43,6 +43,8 @@
 /client/testem.log
 /client/typings
 
+package-lock.json
+
 # System Files
 /client/.DS_Store
 /client/Thumbs.db

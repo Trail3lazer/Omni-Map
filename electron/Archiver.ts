@@ -1,10 +1,10 @@
-import { Archiver } from "archiver";
+import {  } from "jszip";
 import { createWriteStream, WriteStream } from "fs";
 import archiver = require('archiver');
 
 // create a file to stream archive data to.
 
-let archive: Archiver;
+let archive: ;
 
 export class IArchiveService {
 
