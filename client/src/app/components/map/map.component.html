@@ -1,5 +1,12 @@
+<app-nav-bar 
+[targetIsRoot]="targetIsRoot()" 
+[upArrow]="upArrow"
+(moveUpTree$)="moveUpTree()"
+(projectName$)="nameChange($event)"
+></app-nav-bar>
+
 <div *ngIf="targetObj$ | async as target">
-  <img *ngIf="!targetIsRoot()" class="upArrow" [src]="upArrow | local" (click)="moveUpTree()">
+  <img class="upArrow" (click)="moveUpTree()">
   <img class="map" [src]="target.path | local" (click)="mapClick($event)" />
 
   <div *ngIf="newFileForm"

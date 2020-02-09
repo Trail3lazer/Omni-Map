@@ -1,9 +1,10 @@
-import { Component, OnInit, ChangeDetectionStrategy, EventEmitter } from "@angular/core";
+import { Component, OnInit, ChangeDetectionStrategy, EventEmitter, ChangeDetectorRef } from "@angular/core";
 import { ProjectService } from "src/app/services/project.service";
 import { IChild } from "src/app/components/ichild";
-import { BehaviorSubject } from "rxjs";
+import { Observable, BehaviorSubject, Subject } from "rxjs";
 import { INewFileFormValues } from "../new-file-form/new-file-form.component";
 import { IPrimitive } from "../iprimitive-child";
+import { tap } from "rxjs/operators";
 
 @Component({
   selector: "app-map",
@@ -17,13 +18,23 @@ export class MapComponent implements OnInit {
   public contextMenuValue$ = new EventEmitter();
   public newFileForm = false;
   public newFileFormValue$ = new EventEmitter();
-  public targetObj$: BehaviorSubject<IChild> = this.projectService.targetObject$;
+  public targetObj$: Observable<IChild> = this.projectService.targetObject$
+  .pipe(
+    tap(() => this.changeDirector.markForCheck())
+  );
   public upArrow: string = this.projectService.Icons.upArrowIcon;
+  private projectName$: Subject<string> = new Subject();
 
-  constructor(private projectService: ProjectService) { }
+  constructor(
+    private projectService: ProjectService,
+    private changeDirector: ChangeDetectorRef) { }
 
   ngOnInit() {
-    this.projectService.listenForSave();
+    this.projectService.listenForSave(this.projectName$);
+  }
+
+  public nameChange(name: string): void {
+    this.projectName$.next(name);
   }
 
   public targetIsRoot(): boolean { return this.projectService.targetIsRoot(); }

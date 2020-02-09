@@ -1,6 +1,6 @@
 import { Injectable, EventEmitter } from "@angular/core";
 import { IChild } from "../components/ichild";
-import { BehaviorSubject, combineLatest } from "rxjs";
+import { BehaviorSubject, combineLatest, Subject } from "rxjs";
 import { take } from "rxjs/operators";
 import { INewFileFormValues } from "../components/new-file-form/new-file-form.component";
 import { IPrimitive } from "../components/iprimitive-child";
@@ -33,11 +33,13 @@ export class ProjectService {
     upArrowIcon: __dirname + "/assets/icons8-up-squared-50.png"
   };
 
-  constructor(private ipc: IpcService) {
+  constructor(
+    private ipc: IpcService) {
     this.ipc.on("newProjectFile")
     .subscribe(next => {
-      console.log(next);
       this.project = next;
+      this.targetObject = this.project;
+      this.emitTarget();
     });
   }
 
@@ -102,10 +104,14 @@ export class ProjectService {
 
   public emitTarget(): void {
     this.targetObject$.next(this.targetObject);
-    console.info("Emitted", this.project);
   }
 
-  public listenForSave() {
-    this.ipc.respondOn("save", "project file", this.project);
+  public listenForSave(projectName$: Subject<string>): void {
+    const responseObject: {name: string, project: IChild} = {
+      name: "New Omni Map",
+      project: this.project
+    };
+    projectName$.subscribe(next => responseObject.name = next);
+    this.ipc.respondOn("save", "project file", responseObject);
   }
 }

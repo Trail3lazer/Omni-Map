@@ -1,13 +1,13 @@
-import { BrowserWindow, Menu as ElectronMenu, ipcRenderer, webContents } from "electron";
+import { BrowserWindow, Menu as ElectronMenu } from "electron";
 import * as url from "url";
 import { menu } from "./Menu";
 
-let mainWindow: BrowserWindow;
-
 export class IWindow {
 
+    private mainWindow: BrowserWindow;
+
     public createWindow() {
-        mainWindow = new BrowserWindow({
+        this.mainWindow = new BrowserWindow({
             width: 1000,
             height: 700,
             webPreferences: {
@@ -15,7 +15,8 @@ export class IWindow {
             }
         });
 
-        mainWindow.loadURL(
+        
+        this.mainWindow.loadURL(
             url.format({
                 pathname: `../client/dist/index.html`,
                 protocol: "file:",
@@ -23,21 +24,21 @@ export class IWindow {
             })
         );
 
-        mainWindow.setMenu(ElectronMenu.buildFromTemplate(menu.template));
+        this.mainWindow.setMenu(ElectronMenu.buildFromTemplate(menu.template));
 
-        mainWindow.webContents.openDevTools();
+        this.mainWindow.webContents.openDevTools();
 
-        mainWindow.on("closed", () => {
-            mainWindow = null;
-        });
+        // this.mainWindow.on("closed", () => {
+        //     this.mainWindow = null;
+        // });
     }
 
     public send(channel: string, payload: any) {
-        mainWindow.webContents.send(channel, payload)
+        this.mainWindow.webContents.send(channel, payload)
     }
 
     public on(event, callback: any) {
-        mainWindow.webContents.on(event, callback)
+        this.mainWindow.webContents.on(event, callback)
     }
 }
 

@@ -15,6 +15,11 @@ class IMenu {
                         }
                     },
                     {
+                        label: "Open",
+                        click: () => {
+                        }
+                    },
+                    {
                         label: "Save As",
                         click: () => { }
                     },

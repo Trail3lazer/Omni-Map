@@ -1,55 +1,56 @@
-import { Observable, of } from "rxjs";
 import { ipcMain } from "electron";
+import { window } from "./Window";
 import { dialogService } from "./DialogService";
 import { IChild } from "./ichild";
-import { window } from "./Window";
 import { projectService } from "./ProjectService";
-
+import { IpcMain } from "electron";
 class IIpcService {
-
+    private ipc: IpcMain = ipcMain;
     constructor() {
         this.listen();
     }
 
+    public openFIle(): void {
+        dialogService.selectFile().subscribe(
+            next => {
+                
+                window.send("newProjectFile", tree);
+            }
+        )
+    }
+
     public initiateSaveFile(): void {
-        let project$: Observable<IChild>;
-        ipcMain.on("project file", (event, [project]: IChild[]): void => {
-            let newProjectFile = projectService.save(project)
-            window.send("newProjectFile", newProjectFile)
+        this.ipc.on("project file", (event, returnValue: IProjectFileReturn) => {
+            const newProjectFile$ = projectService.save(returnValue.project, returnValue.name);
+            newProjectFile$.subscribe(
+                next => { 
+                    window.send("newProjectFile", next);
+                }
+            )
         });
         window.send("save", null);
     }
-
     private listen() {
         this.listenForImportFile();
-        this.listenForNewProject();
         this.listenForSelectDir();
     }
-
     private listenForSelectDir() {
-        ipcMain.on("select working dir", event => {
-            dialogService.selectFolder().subscribe(
-                path => event.reply("select working dir", path)
-            );
+        this.ipc.on("select working dir", event => {
+            dialogService.selectFolder().subscribe(path => event.reply("select working dir", path));
         });
     }
-
     private listenForImportFile() {
-        ipcMain.on("import file", event => {
-            dialogService.selectFile().subscribe(
-                path => {
-                    event.reply("import file", path)}
-            );
+        this.ipc.on("import file", event => {
+            dialogService.selectFile().subscribe(path => {
+                event.reply("import file", path);
+            });
         });
-    }
-
-    private listenForNewProject() {
-        ipcMain.on("new project", event => {
-            dialogService.createFolder().subscribe(
-                path => event.reply("new project", path)
-            );
-        })
     }
 }
 
-export const ipc: IIpcService = new IIpcService()
+export interface IProjectFileReturn {
+    project: IChild;
+    name: string;
+}
+
+export const ipc: IIpcService = new IIpcService();

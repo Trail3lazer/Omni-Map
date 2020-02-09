@@ -14,30 +14,35 @@ class IDialogService {
             }
             else {
                 console.log("no paths returned");
+                return "";
             }
-        }).catch(err => console.log(err)));
+        }).catch(err => { console.log(err); return ""; }));
     }
     selectFolder() {
         return rxjs_1.from(electron_1.dialog.showOpenDialog({
-            title: "Select project folder",
+            title: "Select project location",
             buttonLabel: "Select",
             properties: ["openDirectory"],
         }));
     }
-    createFolder() {
-        return rxjs_1.from(electron_1.dialog.showOpenDialog({
-            title: "Create project directory",
-            buttonLabel: "Create",
-            properties: ["createDirectory"],
-            message: "Create project directory"
-        }).then(actual => {
-            if (actual.filePaths.length > 0) {
-                return actual.filePaths[0];
+    saveAs(name) {
+        return rxjs_1.from(electron_1.dialog.showSaveDialog({
+            title: "Choose where to save your project",
+            buttonLabel: "Save",
+            defaultPath: electron_1.app.getPath("documents") + "/" + name,
+            message: "Create project file",
+            filters: [{ name: 'Omni Map Project', extensions: ['omni'] },]
+        }).then((actual) => {
+            if (actual.filePath !== undefined) {
+                let dir = actual.filePath;
+                return dir;
             }
-            else {
-                console.log("no paths returned");
-            }
-        }).catch(err => console.log(err)));
+            ;
+            return "";
+        }).catch(err => {
+            console.log(err);
+            return "";
+        }));
     }
 }
 exports.dialogService = new IDialogService();

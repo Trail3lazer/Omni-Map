@@ -1,0 +1,4 @@
+<header>
+  <img *ngIf="!targetIsRoot" class="upArrow" [src]="upArrow | local" (click)="moveUpTree()">
+  <input class="border-0 form-control" type="text" [formControl]="projectName">
+</header>

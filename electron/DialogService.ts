@@ -1,9 +1,9 @@
-import { dialog } from "electron";
-import { from } from "rxjs";
+import { dialog, SaveDialogReturnValue, app } from "electron";
+import { from, Observable } from "rxjs";
 
 class IDialogService {
 
-    public selectFile() {
+    public selectFile(): Observable<string> {
         return from(
             dialog.showOpenDialog(
             {
@@ -16,36 +16,41 @@ class IDialogService {
                 return actual.filePaths[0]
             } else {
                 console.log("no paths returned");
+                return "";
             }
-        }).catch(err => console.log(err)));
+        }).catch(err => {console.log(err); return "";}));
     }
 
     public selectFolder() {
         return from(
             dialog.showOpenDialog(
             {
-                title: "Select project folder",
+                title: "Select project location",
                 buttonLabel: "Select",
                 properties: ["openDirectory"],
             }));
     }
 
-    public createFolder() {
+    public saveAs(name: string): Observable<string>{
         return from(
-            dialog.showOpenDialog(
+            dialog.showSaveDialog(
             {
-                title: "Create project directory",
-                buttonLabel: "Create",
-                properties: ["createDirectory"],
-                message: "Create project directory"
+                title: "Choose where to save your project",
+                buttonLabel: "Save",
+                defaultPath: app.getPath("documents")+"/"+name,
+                message: "Create project file",
+                filters: [{ name: 'Omni Map Project', extensions: ['omni'] },]
             }
-        ).then(actual => {
-            if (actual.filePaths.length > 0) {
-                return actual.filePaths[0];
-            } else {
-                console.log("no paths returned");
-            }
-        }).catch(err => console.log(err)));
+        ).then((actual: SaveDialogReturnValue) => {
+            if (actual.filePath !== undefined) {
+                let dir: string = actual.filePath;
+                return dir;
+            };
+            return "";
+        }).catch(err=>{
+            console.log(err);
+            return "";
+        }))
     }
 }
 

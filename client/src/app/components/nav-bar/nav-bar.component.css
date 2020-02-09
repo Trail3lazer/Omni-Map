@@ -1,0 +1,17 @@
+
+.upArrow {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+}
+
+header {
+    width: 100vw;
+    background-color: ivory;
+    padding: 15px;
+}
+
+header > input {
+    border-bottom: solid 1px lightgrey !important;
+    background-color: ivory;
+}

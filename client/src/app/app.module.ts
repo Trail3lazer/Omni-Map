@@ -9,6 +9,7 @@ import { MapComponent } from "./components/map/map.component";
 import { ContextMenuComponent } from "./components/context-menu/context-menu.component";
 import { LocalPipe } from "./local.pipe";
 import { NewFileFormComponent } from "./components/new-file-form/new-file-form.component";
+import { NavBarComponent } from "./components/nav-bar/nav-bar.component";
 
 @NgModule({
   declarations: [
@@ -17,7 +18,8 @@ import { NewFileFormComponent } from "./components/new-file-form/new-file-form.c
     MapComponent,
     ContextMenuComponent,
     LocalPipe,
-    NewFileFormComponent
+    NewFileFormComponent,
+    NavBarComponent
   ],
   imports: [
     BrowserModule,

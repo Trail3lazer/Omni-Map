@@ -1,33 +1,79 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const fs_1 = require("fs");
-let directory = "C:/Users/jwight1/Desktop";
+const rxjs_1 = require("rxjs");
+const operators_1 = require("rxjs/operators");
+const DialogService_1 = require("./DialogService");
+const Archiver_1 = require("./Archiver");
+let tree;
+function renameLeaf(leaf) {
+    return leaf.ancestry.join("_") + "." + leaf.path.split(".").pop();
+}
 class IProjectService {
-    save(data) {
-        const tree = data;
-        this.treeNodesDepthFirst(tree, this.copyToDir);
-        return tree;
+    save(data, name) {
+        tree = data;
+        if (exports.projectFilePath) {
+            this.archiveData(name);
+            return rxjs_1.of(tree);
+        }
+        return DialogService_1.dialogService.saveAs(name)
+            .pipe(operators_1.tap((path) => {
+            if (path.length < 1) {
+                console.log("User canceled save");
+                return tree;
+            }
+            ;
+            exports.projectFilePath = path;
+            this.archiveData(name);
+        }), operators_1.map(() => tree));
+    }
+    archiveData(name) {
+        Archiver_1.ArchiveService.start(exports.projectFilePath);
+        const fileArray = this.createFileArrayFromTree(tree);
+        Archiver_1.ArchiveService.sendFilesToZip(fileArray);
+        const projectData = {
+            name: name,
+            text: JSON.stringify(tree)
+        };
+        Archiver_1.ArchiveService.zipData(projectData);
+        Archiver_1.ArchiveService.finish();
+    }
+    getFileName(path) {
+        return path.split("\\").pop().split("/").pop();
+    }
+    ;
+    organizeFileToZip(leaf) {
+        const newFileName = renameLeaf(leaf);
+        return {
+            name: newFileName,
+            path: leaf.path
+        };
+    }
+    createFileArrayFromTree(tree) {
+        const fileArray = [];
+        const files$ = new rxjs_1.Subject();
+        files$.subscribe(next => {
+            fileArray.push(next);
+        });
+        this.treeNodesDepthFirst(tree, this.organizeFileToZip, files$);
+        files$.complete();
+        return fileArray;
+    }
+    saveProjectInfo(dir, tree) {
+        const jsonProject = JSON.stringify({
+            directory: dir,
+            tree: tree
+        });
+        const filePath = dir + "project.json";
     }
     getFileExtention(str) {
         return str.split(".").pop();
     }
-    copyToDir(leaf) {
-        const newFileName = leaf.ancestry.join("_") + "." + leaf.path.split(".").pop();
-        const newPath = directory + "/" + newFileName;
-        const newLeaf = Object.assign(Object.assign({}, leaf), { path: newPath });
-        fs_1.copyFile(leaf.path, newPath, () => { });
-        return newLeaf;
-    }
-    treeNodesDepthFirst(leaf, fx) {
-        leaf = fx(leaf);
+    treeNodesDepthFirst(leaf, fx, returnValues$) {
+        returnValues$ ? returnValues$.next(fx(leaf)) : fx(leaf);
         if (leaf.children) {
-            leaf.children.forEach(n => n = this.treeNodesDepthFirst(n, fx));
+            leaf.children.forEach(n => this.treeNodesDepthFirst(n, fx, returnValues$));
         }
         ;
     }
-    getFileName(str) {
-        return str.split("\\").pop().split("/").pop();
-    }
-    ;
 }
 exports.projectService = new IProjectService();
