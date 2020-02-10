@@ -20,13 +20,15 @@
   },
   "homepage": "https://github.com/Trail3lazer/Omni-Map#readme",
   "devDependencies": {
+    "@types/extract-zip": "^1.6.2",
+    "@types/jszip": "^3.1.7",
     "electron": "^7.1.9"
   },
   "dependencies": {
     "@types/archiver": "^3.0.0",
-    "@types/jszip": "^3.1.7",
+    "archiver": "^3.1.1",
     "concurrently": "^5.0.2",
-    "jszip": "^3.2.2",
+    "extract-zip": "^1.6.7",
     "reflect-metadata": "^0.1.13"
   }
 }

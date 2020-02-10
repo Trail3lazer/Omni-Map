@@ -1,4 +1,4 @@
-import { dialog, SaveDialogReturnValue, app } from "electron";
+import { dialog, SaveDialogReturnValue, OpenDialogReturnValue, app } from "electron";
 import { from, Observable } from "rxjs";
 
 class IDialogService {
@@ -21,13 +21,24 @@ class IDialogService {
         }).catch(err => {console.log(err); return "";}));
     }
 
-    public selectFolder() {
+    public selectProjectFile() {
         return from(
             dialog.showOpenDialog(
             {
-                title: "Select project location",
+                title: "Select project",
                 buttonLabel: "Select",
-                properties: ["openDirectory"],
+                properties: ["openFile"],
+                defaultPath: app.getPath("documents"),
+                message: "Open project file",
+                filters: [{ name: 'Omni Map Project', extensions: ['omni'] }]
+            }).then((actual: OpenDialogReturnValue) => {
+                if (actual.filePaths.length !== 0) {
+                    return actual.filePaths[0];
+                };
+                return "";
+            }).catch(err=>{
+                console.log(err);
+                return "";
             }));
     }
 
@@ -39,7 +50,7 @@ class IDialogService {
                 buttonLabel: "Save",
                 defaultPath: app.getPath("documents")+"/"+name,
                 message: "Create project file",
-                filters: [{ name: 'Omni Map Project', extensions: ['omni'] },]
+                filters: [{ name: 'Omni Map Project', extensions: ['omni'] }]
             }
         ).then((actual: SaveDialogReturnValue) => {
             if (actual.filePath !== undefined) {

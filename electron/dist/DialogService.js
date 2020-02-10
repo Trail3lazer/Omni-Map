@@ -18,11 +18,23 @@ class IDialogService {
             }
         }).catch(err => { console.log(err); return ""; }));
     }
-    selectFolder() {
+    selectProjectFile() {
         return rxjs_1.from(electron_1.dialog.showOpenDialog({
-            title: "Select project location",
+            title: "Select project",
             buttonLabel: "Select",
-            properties: ["openDirectory"],
+            properties: ["openFile"],
+            defaultPath: electron_1.app.getPath("documents"),
+            message: "Open project file",
+            filters: [{ name: 'Omni Map Project', extensions: ['omni'] }]
+        }).then((actual) => {
+            if (actual.filePaths.length !== 0) {
+                return actual.filePaths[0];
+            }
+            ;
+            return "";
+        }).catch(err => {
+            console.log(err);
+            return "";
         }));
     }
     saveAs(name) {
@@ -31,7 +43,7 @@ class IDialogService {
             buttonLabel: "Save",
             defaultPath: electron_1.app.getPath("documents") + "/" + name,
             message: "Create project file",
-            filters: [{ name: 'Omni Map Project', extensions: ['omni'] },]
+            filters: [{ name: 'Omni Map Project', extensions: ['omni'] }]
         }).then((actual) => {
             if (actual.filePath !== undefined) {
                 let dir = actual.filePath;

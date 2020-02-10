@@ -3,6 +3,7 @@ import { Subject, of, Observable } from "rxjs";
 import { tap, map } from "rxjs/operators";
 import { dialogService } from "./DialogService";
 import { ArchiveService, FileForZip, DataToZip } from "./Archiver";
+import { WriteStream } from "fs";
 
 export let projectFilePath: string;
 let tree: IChild;
@@ -30,8 +31,19 @@ class IProjectService {
         );
     }
 
-    private archiveData(name: string) {
-        ArchiveService.start(projectFilePath);
+    public open(){
+        dialogService.selectProjectFile()
+        .subscribe(
+            path => {
+                if (path.length < 1) return;
+                ArchiveService.open(path);
+                projectFilePath = path;
+            }
+        )
+    }
+
+    private archiveData(name: string): void {
+        ArchiveService.startZip(projectFilePath);
         const fileArray: FileForZip[] = this.createFileArrayFromTree(tree);
         ArchiveService.sendFilesToZip(fileArray);
         const projectData: DataToZip = {
@@ -39,15 +51,10 @@ class IProjectService {
             text: JSON.stringify(tree)
         };
         ArchiveService.zipData(projectData);
-        ArchiveService.finish();
+        ArchiveService.finishZip();
+        ArchiveService.open(projectFilePath);
     }
 
-    // get save name
-    private getFileName(path: string): string {
-        return path.split("\\").pop().split("/").pop();
-    };
-
-    // copy all files to new folder at directory
     private organizeFileToZip(leaf: IChild): FileForZip {
         const newFileName = renameLeaf(leaf);
         return {
@@ -68,17 +75,12 @@ class IProjectService {
         return fileArray
     }
 
-    // create JSON file with project info in new folder
     private saveProjectInfo(dir: string, tree: IChild): void{
         const jsonProject = JSON.stringify({
             directory: dir,
             tree: tree
         });
         const filePath = dir+"project.json";
-    }
-
-    private getFileExtention(str: string) {
-        return str.split(".").pop();
     }
     
     private treeNodesDepthFirst(leaf: IChild, fx: Function, returnValues$?: Subject<any>): void {

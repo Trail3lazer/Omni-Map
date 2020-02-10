@@ -26,8 +26,17 @@ class IProjectService {
             this.archiveData(name);
         }), operators_1.map(() => tree));
     }
+    open() {
+        DialogService_1.dialogService.selectProjectFile()
+            .subscribe(path => {
+            if (path.length < 1)
+                return;
+            Archiver_1.ArchiveService.open(path);
+            exports.projectFilePath = path;
+        });
+    }
     archiveData(name) {
-        Archiver_1.ArchiveService.start(exports.projectFilePath);
+        Archiver_1.ArchiveService.startZip(exports.projectFilePath);
         const fileArray = this.createFileArrayFromTree(tree);
         Archiver_1.ArchiveService.sendFilesToZip(fileArray);
         const projectData = {
@@ -35,12 +44,9 @@ class IProjectService {
             text: JSON.stringify(tree)
         };
         Archiver_1.ArchiveService.zipData(projectData);
-        Archiver_1.ArchiveService.finish();
+        Archiver_1.ArchiveService.finishZip();
+        Archiver_1.ArchiveService.open(exports.projectFilePath);
     }
-    getFileName(path) {
-        return path.split("\\").pop().split("/").pop();
-    }
-    ;
     organizeFileToZip(leaf) {
         const newFileName = renameLeaf(leaf);
         return {
@@ -64,9 +70,6 @@ class IProjectService {
             tree: tree
         });
         const filePath = dir + "project.json";
-    }
-    getFileExtention(str) {
-        return str.split(".").pop();
     }
     treeNodesDepthFirst(leaf, fx, returnValues$) {
         returnValues$ ? returnValues$.next(fx(leaf)) : fx(leaf);

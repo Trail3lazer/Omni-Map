@@ -11,7 +11,6 @@ class IIpcService {
     }
     openFIle() {
         DialogService_1.dialogService.selectFile().subscribe(next => {
-            Window_1.window.send("newProjectFile", tree);
         });
     }
     initiateSaveFile() {

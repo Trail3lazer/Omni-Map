@@ -13,8 +13,8 @@ class IIpcService {
     public openFIle(): void {
         dialogService.selectFile().subscribe(
             next => {
-                
-                window.send("newProjectFile", tree);
+
+                // window.send("newProjectFile", tree);
             }
         )
     }

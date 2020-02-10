@@ -1,6 +1,6 @@
 import * as Electron from "electron";
 import { ipc } from "./IpcService";
-import { projectService } from "./ProjectService";
+import { projectService, projectFilePath } from "./ProjectService";
 
 class IMenu {
 
@@ -18,6 +18,7 @@ class IMenu {
         {
           label: "Open",
           click: () => {
+            projectService.open()
           }
         },
         {
@@ -38,9 +39,6 @@ class IMenu {
       label: "edit",
       role: "editMenu",
       submenu: [
-        {
-          role: "forceReload"
-        }
       ]
     },
     {
