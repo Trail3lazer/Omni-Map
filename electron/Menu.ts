@@ -1,6 +1,5 @@
 import * as Electron from "electron";
 import { ipc } from "./IpcService";
-import { projectService, projectFilePath } from "./ProjectService";
 
 class IMenu {
 
@@ -12,18 +11,20 @@ class IMenu {
         {
           label: "Save",
           click: () => {
-            ipc.initiateSaveFile()
+            ipc.initiateSaveFile();
           }
         },
         {
           label: "Open",
           click: () => {
-            projectService.open()
+            ipc.openFile();
           }
         },
         {
           label: "Save As",
-          click: () => { }
+          click: () => {
+            ipc.initiateSaveAsFile()
+           }
         },
         {
           label: "New Project",

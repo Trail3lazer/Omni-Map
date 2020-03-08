@@ -33,7 +33,6 @@ export class IpcService {
   public respondOn(channel: string, responseChannel: string, response: any) {
     this.ipc.on(channel, () => {
       this.send(responseChannel, response);
-      console.log(response);
     });
   }
 

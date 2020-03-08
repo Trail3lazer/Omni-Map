@@ -7,29 +7,30 @@ const ProjectService_1 = require("./ProjectService");
 class IIpcService {
     constructor() {
         this.ipc = electron_1.ipcMain;
-        this.listen();
+        this.listenForImportFile();
     }
-    openFIle() {
-        DialogService_1.dialogService.selectFile().subscribe(next => {
-        });
+    openFile() {
+        ProjectService_1.projectService.open().subscribe(tree => Window_1.window.send("newProjectFile", tree));
     }
     initiateSaveFile() {
         this.ipc.on("project file", (event, returnValue) => {
-            const newProjectFile$ = ProjectService_1.projectService.save(returnValue.project, returnValue.name);
-            newProjectFile$.subscribe(next => {
+            ProjectService_1.tree$.subscribe(next => {
                 Window_1.window.send("newProjectFile", next);
+                ProjectService_1.tree$.unsubscribe();
             });
+            ProjectService_1.projectService.save(returnValue.project, returnValue.name);
         });
         Window_1.window.send("save", null);
     }
-    listen() {
-        this.listenForImportFile();
-        this.listenForSelectDir();
-    }
-    listenForSelectDir() {
-        this.ipc.on("select working dir", event => {
-            DialogService_1.dialogService.selectFolder().subscribe(path => event.reply("select working dir", path));
+    initiateSaveAsFile() {
+        this.ipc.on("project file", (event, returnValue) => {
+            ProjectService_1.tree$.subscribe(next => {
+                Window_1.window.send("newProjectFile", next);
+                ProjectService_1.tree$.unsubscribe();
+            });
+            ProjectService_1.projectService.saveAs(returnValue.name, returnValue.project);
         });
+        Window_1.window.send("save", null);
     }
     listenForImportFile() {
         this.ipc.on("import file", event => {

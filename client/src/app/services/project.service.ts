@@ -39,6 +39,7 @@ export class ProjectService {
     .subscribe(next => {
       this.project = next;
       this.targetObject = this.project;
+      console.log(this.project);
       this.emitTarget();
     });
   }

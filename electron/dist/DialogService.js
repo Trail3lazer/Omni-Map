@@ -46,8 +46,8 @@ class IDialogService {
             filters: [{ name: 'Omni Map Project', extensions: ['omni'] }]
         }).then((actual) => {
             if (actual.filePath !== undefined) {
-                let dir = actual.filePath;
-                return dir;
+                console.log("Return path");
+                return actual.filePath;
             }
             ;
             return "";

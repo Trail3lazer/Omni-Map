@@ -54,8 +54,9 @@ class IDialogService {
             }
         ).then((actual: SaveDialogReturnValue) => {
             if (actual.filePath !== undefined) {
-                let dir: string = actual.filePath;
-                return dir;
+                
+                console.log("Return path")
+                return actual.filePath
             };
             return "";
         }).catch(err=>{

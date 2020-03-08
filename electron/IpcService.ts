@@ -2,43 +2,46 @@ import { ipcMain } from "electron";
 import { window } from "./Window";
 import { dialogService } from "./DialogService";
 import { IChild } from "./ichild";
-import { projectService } from "./ProjectService";
+import { projectService, tree$ } from "./ProjectService";
 import { IpcMain } from "electron";
 class IIpcService {
     private ipc: IpcMain = ipcMain;
     constructor() {
-        this.listen();
+        this.listenForImportFile();
     }
 
-    public openFIle(): void {
-        dialogService.selectFile().subscribe(
-            next => {
-
-                // window.send("newProjectFile", tree);
-            }
-        )
+    public openFile(): void {
+        projectService.open().subscribe(
+            tree => window.send("newProjectFile", tree)
+        );
     }
 
     public initiateSaveFile(): void {
-        this.ipc.on("project file", (event, returnValue: IProjectFileReturn) => {
-            const newProjectFile$ = projectService.save(returnValue.project, returnValue.name);
-            newProjectFile$.subscribe(
-                next => { 
+        this.ipc.on("project file", (event, returnValue: IProjectFileReturn) => {            
+            tree$.subscribe(
+                next => {
                     window.send("newProjectFile", next);
+                    tree$.unsubscribe();
                 }
-            )
+            );
+            projectService.save(returnValue.project, returnValue.name)
         });
         window.send("save", null);
     }
-    private listen() {
-        this.listenForImportFile();
-        this.listenForSelectDir();
-    }
-    private listenForSelectDir() {
-        this.ipc.on("select working dir", event => {
-            dialogService.selectFolder().subscribe(path => event.reply("select working dir", path));
+
+    public initiateSaveAsFile(): void {
+        this.ipc.on("project file", (event, returnValue: IProjectFileReturn) => {
+            tree$.subscribe(
+                next => {
+                    window.send("newProjectFile", next);
+                    tree$.unsubscribe();
+                }
+            );
+            projectService.saveAs(returnValue.name, returnValue.project)
         });
+        window.send("save", null);
     }
+
     private listenForImportFile() {
         this.ipc.on("import file", event => {
             dialogService.selectFile().subscribe(path => {

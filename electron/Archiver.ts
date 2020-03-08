@@ -1,7 +1,8 @@
-import { createWriteStream, rmdirSync, readdirSync, existsSync, statSync, unlinkSync } from "fs";
+import { constants, createWriteStream, rmdirSync, readdirSync, accessSync, statSync, unlinkSync, access } from "fs";
 import * as archiver from "archiver";
 import { Archiver } from "archiver";
 import * as extract from "extract-zip";
+import {from, of, Observable} from "rxjs";
 
 // create a file to stream archive data to.
 
@@ -9,9 +10,16 @@ let archive: Archiver;
 
 export class IArchiveService {
 
-    public open(zipPath: string) {
-        this.deleteTemp()
+    public async open(zipPath: string) {
+        // return of(this.deleteTemp())
+        // .subscribe(
         this.extractZip(zipPath);
+        // );
+    }
+
+    public cleanPath(path: string): void {
+            accessSync(path);
+            unlinkSync(path);
     }
 
     public startZip(path: string): void {
@@ -28,22 +36,26 @@ export class IArchiveService {
     }
 
     public zipData(data: DataToZip): void {
-        archive.append(data.text, { name: data.name });
+        archive.append(data.text, { name: "project" });
     }
 
-    public finishZip(): void {
-        archive.finalize()
+    public finishZip(): Promise<void> {
+        return archive.finalize()
     }
 
     private extractZip(zipPath: string) {
         extract(zipPath, {
             dir: process.cwd() + "/temp"
-        }, err => console.log(err));
+        }, err => {
+            console.log(err);
+            return;
+        });
     }
 
-    private deleteTemp(): void {
+    private deleteTemp() {
         const path = process.cwd() + "/temp";
-        if (existsSync(path)) {
+        try {
+            accessSync(path, constants.W_OK | constants.R_OK)
             const files = readdirSync(path)
             if (files.length > 0) {
                 files.forEach(function (filename) {
@@ -54,9 +66,14 @@ export class IArchiveService {
                     }
                 })
                 rmdirSync(path)
+                return;
             } else {
                 rmdirSync(path)
+                return;
             }
+        } catch { 
+            console.log("no access in deleteTemp")
+            return;
         }
     }
 }

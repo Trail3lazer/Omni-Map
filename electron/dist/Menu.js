@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const IpcService_1 = require("./IpcService");
-const ProjectService_1 = require("./ProjectService");
 class IMenu {
     constructor() {
         this.template = [
@@ -18,12 +17,14 @@ class IMenu {
                     {
                         label: "Open",
                         click: () => {
-                            ProjectService_1.projectService.open();
+                            IpcService_1.ipc.openFile();
                         }
                     },
                     {
                         label: "Save As",
-                        click: () => { }
+                        click: () => {
+                            IpcService_1.ipc.initiateSaveAsFile();
+                        }
                     },
                     {
                         label: "New Project",
