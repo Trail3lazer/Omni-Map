@@ -4,6 +4,7 @@ import { dialogService } from "./DialogService";
 import { IChild } from "./ichild";
 import { projectService, tree$ } from "./ProjectService";
 import { IpcMain } from "electron";
+import { take } from "rxjs/operators";
 class IIpcService {
     private ipc: IpcMain = ipcMain;
     constructor() {
@@ -18,10 +19,9 @@ class IIpcService {
 
     public initiateSaveFile(): void {
         this.ipc.on("project file", (event, returnValue: IProjectFileReturn) => {            
-            tree$.subscribe(
+            tree$.pipe(take(1)).subscribe(
                 next => {
                     window.send("newProjectFile", next);
-                    tree$.unsubscribe();
                 }
             );
             projectService.save(returnValue.project, returnValue.name)
@@ -31,10 +31,9 @@ class IIpcService {
 
     public initiateSaveAsFile(): void {
         this.ipc.on("project file", (event, returnValue: IProjectFileReturn) => {
-            tree$.subscribe(
+            tree$.pipe(take(1)).subscribe(
                 next => {
                     window.send("newProjectFile", next);
-                    tree$.unsubscribe();
                 }
             );
             projectService.saveAs(returnValue.name, returnValue.project)

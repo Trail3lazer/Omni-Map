@@ -26,15 +26,15 @@ class IProjectService {
     public saveAs(name: string, data: IChild): void {
         tree$.next(data);
         dialogService.saveAs(name)
-        .subscribe((path: string) => {
-            console.log("save as emitted")
-            if (path.length < 1) { 
-                console.log("User canceled save"); 
-                return tree$.next(data);
-            };
-            projectFilePath$.next(path);
-            this.archiveData(name, path, data);
-        })            
+            .subscribe((path: string) => {
+                console.log("save as emitted")
+                if (path.length < 1) {
+                    console.log("User canceled save");
+                    return tree$.next(data);
+                };
+                projectFilePath$.next(path);
+                this.archiveData(name, path, data);
+            })
     }
 
     public open(): Observable<void> {
@@ -57,19 +57,17 @@ class IProjectService {
 
     private archiveData(name: string, path: string, tree: IChild): Observable<void> {
         console.log("archiveData")
-        return from(async () => {
-            await ArchiveService.cleanPath(path)
-            ArchiveService.startZip(path);
-            const fileArray: FileForZip[] = this.createFileArrayFromTree(tree);
-            ArchiveService.sendFilesToZip(fileArray);
-            const projectData: DataToZip = {
-                name: name,
-                text: JSON.stringify(tree)
-            };
-            ArchiveService.zipData(projectData);
-            ArchiveService.finishZip()
-            ArchiveService.open(path)
-        })
+        ArchiveService.cleanPath(path)
+        ArchiveService.startZip(path);
+        const fileArray: FileForZip[] = this.createFileArrayFromTree(tree);
+        ArchiveService.sendFilesToZip(fileArray);
+        const projectData: DataToZip = {
+            name: name,
+            text: JSON.stringify(tree)
+        };
+        ArchiveService.zipData(projectData);
+        ArchiveService.finishZip()
+        return from(ArchiveService.open(path))
     }
 
     private organizeFileToZip(leaf: IChild): FileForZip {

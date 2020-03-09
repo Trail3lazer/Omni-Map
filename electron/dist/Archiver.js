@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const fs_1 = require("fs");
 const archiver = require("archiver");
 const extract = require("extract-zip");
+const rxjs_1 = require("rxjs");
 let archive;
 class IArchiveService {
     open(zipPath) {
@@ -20,8 +21,13 @@ class IArchiveService {
         });
     }
     cleanPath(path) {
-        fs_1.accessSync(path);
-        fs_1.unlinkSync(path);
+        try {
+            fs_1.accessSync(path);
+            fs_1.unlinkSync(path);
+        }
+        catch (_a) {
+            return;
+        }
     }
     startZip(path) {
         archive = archiver("zip", {
@@ -36,9 +42,16 @@ class IArchiveService {
         archive.append(data.text, { name: "project" });
     }
     finishZip() {
-        return archive.finalize();
+        return rxjs_1.from(archive.finalize());
     }
     extractZip(zipPath) {
+        try {
+            fs_1.mkdirSync(process.cwd() + "/temp", { recursive: true });
+        }
+        catch (e) {
+            console.log(e);
+        }
+        ;
         extract(zipPath, {
             dir: process.cwd() + "/temp"
         }, err => {

@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
@@ -60,19 +51,17 @@ class IProjectService {
     }
     archiveData(name, path, tree) {
         console.log("archiveData");
-        return rxjs_1.from(() => __awaiter(this, void 0, void 0, function* () {
-            yield Archiver_1.ArchiveService.cleanPath(path);
-            Archiver_1.ArchiveService.startZip(path);
-            const fileArray = this.createFileArrayFromTree(tree);
-            Archiver_1.ArchiveService.sendFilesToZip(fileArray);
-            const projectData = {
-                name: name,
-                text: JSON.stringify(tree)
-            };
-            Archiver_1.ArchiveService.zipData(projectData);
-            Archiver_1.ArchiveService.finishZip();
-            Archiver_1.ArchiveService.open(path);
-        }));
+        Archiver_1.ArchiveService.cleanPath(path);
+        Archiver_1.ArchiveService.startZip(path);
+        const fileArray = this.createFileArrayFromTree(tree);
+        Archiver_1.ArchiveService.sendFilesToZip(fileArray);
+        const projectData = {
+            name: name,
+            text: JSON.stringify(tree)
+        };
+        Archiver_1.ArchiveService.zipData(projectData);
+        Archiver_1.ArchiveService.finishZip();
+        return rxjs_1.from(Archiver_1.ArchiveService.open(path));
     }
     organizeFileToZip(leaf) {
         const newFileName = renameLeaf(leaf);

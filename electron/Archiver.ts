@@ -1,4 +1,4 @@
-import { constants, createWriteStream, rmdirSync, readdirSync, accessSync, statSync, unlinkSync, access } from "fs";
+import { constants, createWriteStream, rmdirSync, readdirSync, accessSync, statSync, unlinkSync, access, mkdirSync } from "fs";
 import * as archiver from "archiver";
 import { Archiver } from "archiver";
 import * as extract from "extract-zip";
@@ -11,15 +11,16 @@ let archive: Archiver;
 export class IArchiveService {
 
     public async open(zipPath: string) {
-        // return of(this.deleteTemp())
-        // .subscribe(
         this.extractZip(zipPath);
-        // );
     }
 
     public cleanPath(path: string): void {
-            accessSync(path);
-            unlinkSync(path);
+            try {
+                accessSync(path);
+                unlinkSync(path);
+            } catch {
+                return;
+            }
     }
 
     public startZip(path: string): void {
@@ -39,11 +40,14 @@ export class IArchiveService {
         archive.append(data.text, { name: "project" });
     }
 
-    public finishZip(): Promise<void> {
-        return archive.finalize()
+    public finishZip(): Observable<void> {
+        return from(archive.finalize());
     }
 
-    private extractZip(zipPath: string) {
+    private extractZip(zipPath: string):void {
+        try {
+            mkdirSync(process.cwd() + "/temp", { recursive: true })
+        } catch (e) {console.log(e)};
         extract(zipPath, {
             dir: process.cwd() + "/temp"
         }, err => {
