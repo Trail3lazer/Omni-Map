@@ -52,7 +52,7 @@ class IProjectService {
     archiveData(name, path, tree) {
         console.log("archiveData");
         Archiver_1.ArchiveService.cleanPath(path);
-        Archiver_1.ArchiveService.startZip(path);
+        Archiver_1.ArchiveService.startZip();
         const fileArray = this.createFileArrayFromTree(tree);
         Archiver_1.ArchiveService.sendFilesToZip(fileArray);
         const projectData = {
@@ -60,8 +60,7 @@ class IProjectService {
             text: JSON.stringify(tree)
         };
         Archiver_1.ArchiveService.zipData(projectData);
-        Archiver_1.ArchiveService.finishZip();
-        return rxjs_1.from(Archiver_1.ArchiveService.open(path));
+        return Archiver_1.ArchiveService.finishZip(path).pipe(operators_1.switchMapTo(rxjs_1.from(Archiver_1.ArchiveService.open(path))));
     }
     organizeFileToZip(leaf) {
         const newFileName = renameLeaf(leaf);

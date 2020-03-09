@@ -17,6 +17,7 @@ let archive;
 class IArchiveService {
     open(zipPath) {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log("open");
             this.extractZip(zipPath);
         });
     }
@@ -29,19 +30,24 @@ class IArchiveService {
             return;
         }
     }
-    startZip(path) {
+    startZip() {
         archive = archiver("zip", {
-            store: true
+            store: true,
+            readableObjectMode: true
         });
-        archive.pipe(fs_1.createWriteStream(path));
     }
     sendFilesToZip(arr) {
-        arr.forEach(val => archive.file(val.path, { name: val.name }));
+        arr.forEach((val) => __awaiter(this, void 0, void 0, function* () {
+            yield archive.file(val.path, { name: val.name });
+        }));
     }
     zipData(data) {
-        archive.append(data.text, { name: "project" });
+        archive.append(data.text, { name: data.name });
     }
-    finishZip() {
+    finishZip(path) {
+        const stream = fs_1.createWriteStream(path);
+        archive.pipe(stream);
+        archive.on("finish", () => stream.end());
         return rxjs_1.from(archive.finalize());
     }
     extractZip(zipPath) {
@@ -49,15 +55,20 @@ class IArchiveService {
             fs_1.mkdirSync(process.cwd() + "/temp", { recursive: true });
         }
         catch (e) {
-            console.log(e);
+            "File already exists";
         }
         ;
-        extract(zipPath, {
-            dir: process.cwd() + "/temp"
-        }, err => {
-            console.log(err);
-            return;
-        });
+        try {
+            extract(zipPath, {
+                dir: process.cwd() + "/temp"
+            }, err => {
+                console.log(err);
+                return;
+            });
+        }
+        catch (_a) {
+            console.log("Could not open files");
+        }
     }
     deleteTemp() {
         const path = process.cwd() + "/temp";

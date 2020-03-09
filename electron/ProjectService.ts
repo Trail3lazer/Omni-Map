@@ -1,6 +1,6 @@
 import { IChild } from "./ichild";
 import { from, Subject, BehaviorSubject, Observable } from "rxjs";
-import { tap, map } from "rxjs/operators";
+import { tap, map, switchMapTo } from "rxjs/operators";
 import { dialogService } from "./DialogService";
 import { ArchiveService, FileForZip, DataToZip } from "./Archiver";
 import { readFileSync } from "fs";
@@ -58,7 +58,7 @@ class IProjectService {
     private archiveData(name: string, path: string, tree: IChild): Observable<void> {
         console.log("archiveData")
         ArchiveService.cleanPath(path)
-        ArchiveService.startZip(path);
+        ArchiveService.startZip();
         const fileArray: FileForZip[] = this.createFileArrayFromTree(tree);
         ArchiveService.sendFilesToZip(fileArray);
         const projectData: DataToZip = {
@@ -66,8 +66,9 @@ class IProjectService {
             text: JSON.stringify(tree)
         };
         ArchiveService.zipData(projectData);
-        ArchiveService.finishZip()
-        return from(ArchiveService.open(path))
+        return ArchiveService.finishZip(path).pipe(
+            switchMapTo(from(ArchiveService.open(path)))
+        )
     }
 
     private organizeFileToZip(leaf: IChild): FileForZip {
