@@ -1,6 +1,6 @@
 import { IChild } from "./ichild";
-import { from, Subject, BehaviorSubject, Observable } from "rxjs";
-import { tap, map, switchMapTo } from "rxjs/operators";
+import { from, Subject, BehaviorSubject, Observable, concat } from "rxjs";
+import { tap, map } from "rxjs/operators";
 import { dialogService } from "./DialogService";
 import { ArchiveService, FileForZip, DataToZip } from "./Archiver";
 import { readFileSync } from "fs";
@@ -14,61 +14,50 @@ function renameLeaf(leaf: IChild): string {
 
 class IProjectService {
 
-    public save(data: IChild, name: string): void {
+    public async save(data: IChild, name: string): Promise<void> {
         if (projectFilePath$.value) {
             tree$.next(data);
-            this.archiveData(name, projectFilePath$.value, data)
+            await this.archiveData(name, projectFilePath$.value, data);
+            console.log("Archive done");
         } else {
-            this.saveAs(name, data);
+            await this.saveAs(name, data);
         };
     }
 
-    public saveAs(name: string, data: IChild): void {
+    public async saveAs(name: string, data: IChild): Promise<void> {
         tree$.next(data);
-        dialogService.saveAs(name)
-            .subscribe((path: string) => {
-                console.log("save as emitted")
-                if (path.length < 1) {
-                    console.log("User canceled save");
-                    return tree$.next(data);
-                };
-                projectFilePath$.next(path);
-                this.archiveData(name, path, data);
-            })
+        const path = await dialogService.saveAs(name)
+        if (path.length < 1) {
+            console.log("User canceled save");
+            return tree$.next(data);
+        };
+        projectFilePath$.next(path);
+        await this.archiveData(name, path, data);
+        console.log("Archive done");
     }
 
-    public open(): Observable<void> {
-        return dialogService.selectProjectFile()
-            .pipe(
-                tap(path => {
-                    if (path.length > 1) {
-                        projectFilePath$.subscribe(path => ArchiveService.open(path))
-                        projectFilePath$.next(path);
-                    }
-                }),
-                map(path => {
-                    if (path.length > 1) {
-                        const projectTreePath = `${process.cwd()}\\temp\\project`;
-                        tree$.next(JSON.parse(readFileSync(projectTreePath).toString()));
-                    }
-                })
-            )
+    public async open(): Promise<void> {
+        const path = await dialogService.selectProjectFile()
+        if (path.length > 1) {
+            projectFilePath$.subscribe(path => ArchiveService.open(path))
+            projectFilePath$.next(path);
+            const projectTreePath = `${process.cwd()}\\temp\\project`;
+            tree$.next(JSON.parse(readFileSync(projectTreePath).toString()));
+        }
     }
 
-    private archiveData(name: string, path: string, tree: IChild): Observable<void> {
-        console.log("archiveData")
-        ArchiveService.cleanPath(path)
+    private async archiveData(name: string, path: string, tree: IChild) {
+        await ArchiveService.cleanPath(path)
         ArchiveService.startZip();
         const fileArray: FileForZip[] = this.createFileArrayFromTree(tree);
-        ArchiveService.sendFilesToZip(fileArray);
+        await ArchiveService.sendFilesToZip(fileArray);
         const projectData: DataToZip = {
             name: name,
             text: JSON.stringify(tree)
         };
         ArchiveService.zipData(projectData);
-        return ArchiveService.finishZip(path).pipe(
-            switchMapTo(from(ArchiveService.open(path)))
-        )
+        await ArchiveService.finishZip(path);
+        await this.open
     }
 
     private organizeFileToZip(leaf: IChild): FileForZip {

@@ -109,7 +109,7 @@ export class ProjectService {
 
   public listenForSave(projectName$: Subject<string>): void {
     const responseObject: {name: string, project: IChild} = {
-      name: "New Omni Map",
+      name: this.project.name,
       project: this.project
     };
     projectName$.subscribe(next => responseObject.name = next);

@@ -1,4 +1,13 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const electron_1 = require("electron");
 const Window_1 = require("./Window");
@@ -11,7 +20,10 @@ class IIpcService {
         this.listenForImportFile();
     }
     openFile() {
-        ProjectService_1.projectService.open().subscribe(tree => Window_1.window.send("newProjectFile", tree));
+        return __awaiter(this, void 0, void 0, function* () {
+            const tree = yield ProjectService_1.projectService.open();
+            Window_1.window.send("newProjectFile", tree);
+        });
     }
     initiateSaveFile() {
         this.ipc.on("project file", (event, returnValue) => {
@@ -32,11 +44,10 @@ class IIpcService {
         Window_1.window.send("save", null);
     }
     listenForImportFile() {
-        this.ipc.on("import file", event => {
-            DialogService_1.dialogService.selectFile().subscribe(path => {
-                event.reply("import file", path);
-            });
-        });
+        this.ipc.on("import file", (event) => __awaiter(this, void 0, void 0, function* () {
+            const path = yield DialogService_1.dialogService.selectFile();
+            event.reply("import file", path);
+        }));
     }
 }
 exports.ipc = new IIpcService();

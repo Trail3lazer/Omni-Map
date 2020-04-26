@@ -11,10 +11,9 @@ class IIpcService {
         this.listenForImportFile();
     }
 
-    public openFile(): void {
-        projectService.open().subscribe(
-            tree => window.send("newProjectFile", tree)
-        );
+    public async openFile(): Promise<void> {
+        const tree = await projectService.open();
+        window.send("newProjectFile", tree);
     }
 
     public initiateSaveFile(): void {
@@ -42,10 +41,9 @@ class IIpcService {
     }
 
     private listenForImportFile() {
-        this.ipc.on("import file", event => {
-            dialogService.selectFile().subscribe(path => {
-                event.reply("import file", path);
-            });
+        this.ipc.on("import file", async event => {
+            const path = await dialogService.selectFile()
+            event.reply("import file", path);
         });
     }
 }

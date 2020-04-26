@@ -1,7 +1,15 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const rxjs_1 = require("rxjs");
-const operators_1 = require("rxjs/operators");
 const DialogService_1 = require("./DialogService");
 const Archiver_1 = require("./Archiver");
 const fs_1 = require("fs");
@@ -12,55 +20,57 @@ function renameLeaf(leaf) {
 }
 class IProjectService {
     save(data, name) {
-        if (exports.projectFilePath$.value) {
-            exports.tree$.next(data);
-            this.archiveData(name, exports.projectFilePath$.value, data);
-        }
-        else {
-            this.saveAs(name, data);
-        }
-        ;
+        return __awaiter(this, void 0, void 0, function* () {
+            if (exports.projectFilePath$.value) {
+                exports.tree$.next(data);
+                yield this.archiveData(name, exports.projectFilePath$.value, data);
+                console.log("Archive done");
+            }
+            else {
+                yield this.saveAs(name, data);
+            }
+            ;
+        });
     }
     saveAs(name, data) {
-        exports.tree$.next(data);
-        DialogService_1.dialogService.saveAs(name)
-            .subscribe((path) => {
-            console.log("save as emitted");
+        return __awaiter(this, void 0, void 0, function* () {
+            exports.tree$.next(data);
+            const path = yield DialogService_1.dialogService.saveAs(name);
             if (path.length < 1) {
                 console.log("User canceled save");
                 return exports.tree$.next(data);
             }
             ;
             exports.projectFilePath$.next(path);
-            this.archiveData(name, path, data);
+            yield this.archiveData(name, path, data);
+            console.log("Archive done");
         });
     }
     open() {
-        return DialogService_1.dialogService.selectProjectFile()
-            .pipe(operators_1.tap(path => {
+        return __awaiter(this, void 0, void 0, function* () {
+            const path = yield DialogService_1.dialogService.selectProjectFile();
             if (path.length > 1) {
                 exports.projectFilePath$.subscribe(path => Archiver_1.ArchiveService.open(path));
                 exports.projectFilePath$.next(path);
-            }
-        }), operators_1.map(path => {
-            if (path.length > 1) {
                 const projectTreePath = `${process.cwd()}\\temp\\project`;
                 exports.tree$.next(JSON.parse(fs_1.readFileSync(projectTreePath).toString()));
             }
-        }));
+        });
     }
     archiveData(name, path, tree) {
-        console.log("archiveData");
-        Archiver_1.ArchiveService.cleanPath(path);
-        Archiver_1.ArchiveService.startZip();
-        const fileArray = this.createFileArrayFromTree(tree);
-        Archiver_1.ArchiveService.sendFilesToZip(fileArray);
-        const projectData = {
-            name: name,
-            text: JSON.stringify(tree)
-        };
-        Archiver_1.ArchiveService.zipData(projectData);
-        return Archiver_1.ArchiveService.finishZip(path).pipe(operators_1.switchMapTo(rxjs_1.from(Archiver_1.ArchiveService.open(path))));
+        return __awaiter(this, void 0, void 0, function* () {
+            yield Archiver_1.ArchiveService.cleanPath(path);
+            Archiver_1.ArchiveService.startZip();
+            const fileArray = this.createFileArrayFromTree(tree);
+            yield Archiver_1.ArchiveService.sendFilesToZip(fileArray);
+            const projectData = {
+                name: name,
+                text: JSON.stringify(tree)
+            };
+            Archiver_1.ArchiveService.zipData(projectData);
+            yield Archiver_1.ArchiveService.finishZip(path);
+            yield this.open;
+        });
     }
     organizeFileToZip(leaf) {
         const newFileName = renameLeaf(leaf);
