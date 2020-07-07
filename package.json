@@ -22,7 +22,7 @@
   "devDependencies": {
     "@types/extract-zip": "^1.6.2",
     "@types/jszip": "^3.1.7",
-    "electron": "^7.1.9"
+    "electron": "^7.2.4"
   },
   "dependencies": {
     "@types/archiver": "^3.0.0",
