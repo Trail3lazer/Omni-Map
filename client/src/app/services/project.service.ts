@@ -36,7 +36,7 @@ export class ProjectService {
   constructor(
     private ipc: IpcService) {
     this.ipc.on("newProjectFile")
-    .subscribe(next => {
+    .subscribe((next: IChild) => {
       this.project = next;
       this.targetObject = this.project;
       console.log(this.project);

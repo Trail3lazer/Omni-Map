@@ -1,48 +1,48 @@
 import { IChild } from "./ichild";
-import { from, Subject, BehaviorSubject, Observable, concat } from "rxjs";
-import { tap, map } from "rxjs/operators";
+import { Subject } from "rxjs";
 import { dialogService } from "./DialogService";
 import { ArchiveService, FileForZip, DataToZip } from "./Archiver";
 import { readFileSync } from "fs";
+import * as _ from "lodash";
 
-export let projectFilePath$: BehaviorSubject<string> = new BehaviorSubject(null);
+export let projectFilePath$: Subject<string> = new Subject();
 export let tree$: Subject<IChild> = new Subject;
-
-function renameLeaf(leaf: IChild): string {
-    return leaf.ancestry.join("_") + "." + leaf.path.split(".").pop();
-}
+let projectFilePath: string;
 
 class IProjectService {
 
+    constructor() {
+        projectFilePath$.subscribe(path => {
+            projectFilePath = path;
+            ArchiveService.open(path);
+        })
+    }
+
     public async save(data: IChild, name: string): Promise<void> {
-        if (projectFilePath$.value) {
+        if (projectFilePath) {
             tree$.next(data);
-            await this.archiveData(name, projectFilePath$.value, data);
-            console.log("Archive done");
+            await this.archiveData(name, projectFilePath, data);
         } else {
             await this.saveAs(name, data);
         };
     }
 
     public async saveAs(name: string, data: IChild): Promise<void> {
-        tree$.next(data);
         const path = await dialogService.saveAs(name)
         if (path.length < 1) {
             console.log("User canceled save");
-            return tree$.next(data);
         };
-        projectFilePath$.next(path);
         await this.archiveData(name, path, data);
-        console.log("Archive done");
     }
 
     public async open(): Promise<void> {
         const path = await dialogService.selectProjectFile()
-        if (path.length > 1) {
-            projectFilePath$.subscribe(path => ArchiveService.open(path))
+        if (path) {
             projectFilePath$.next(path);
             const projectTreePath = `${process.cwd()}\\temp\\project`;
-            tree$.next(JSON.parse(readFileSync(projectTreePath).toString()));
+            const newProjectTree = JSON.parse(readFileSync(projectTreePath).toString());
+            tree$.next(newProjectTree);
+            console.log(path);
         }
     }
 
@@ -57,30 +57,38 @@ class IProjectService {
         };
         ArchiveService.zipData(projectData);
         await ArchiveService.finishZip(path);
-        await this.open
+        await this.open()
+    }
+    
+    private prepareFileForStorage(leaf: IChild): void {
+        const newFileName = leaf.ancestry.join("_") + "." + this.getFileExtension(leaf.path);
+        leaf.path = process.cwd() + "\\temp\\" + newFileName; 
+    }
+
+    private getFileExtension(path: string): string{
+        return path.split(".").pop();
     }
 
     private organizeFileToZip(leaf: IChild): FileForZip {
-        const newFileName = renameLeaf(leaf);
-        const oldPath = leaf.path;
-        leaf.path = process.cwd() + "\\temp\\" + newFileName;
+        const oldPath = leaf.path.toString();
+        this.prepareFileForStorage(leaf);
         return {
-            name: newFileName,
+            name: leaf.path,
             path: oldPath
         }
     }
 
     private createFileArrayFromTree(tree: IChild): FileForZip[] {
         const fileArray: FileForZip[] = [];
-        const files$ = new Subject<FileForZip>()
-        let treeHolder = tree;
+        const files$ = new Subject<FileForZip>();
+        const mutableTree = _.cloneDeep(tree);
         files$.subscribe(
             next => {
                 fileArray.push(next);
             });
-        this.treeNodesDepthFirst(treeHolder, this.organizeFileToZip, files$);
+        this.treeNodesDepthFirst(mutableTree, this.organizeFileToZip, files$);
+        tree$.next(mutableTree)
         files$.complete();
-        tree$.next(treeHolder);
         return fileArray
     }
 

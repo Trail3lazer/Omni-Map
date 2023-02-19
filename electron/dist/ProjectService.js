@@ -13,18 +13,22 @@ const rxjs_1 = require("rxjs");
 const DialogService_1 = require("./DialogService");
 const Archiver_1 = require("./Archiver");
 const fs_1 = require("fs");
-exports.projectFilePath$ = new rxjs_1.BehaviorSubject(null);
+const _ = require("lodash");
+exports.projectFilePath$ = new rxjs_1.Subject();
 exports.tree$ = new rxjs_1.Subject;
-function renameLeaf(leaf) {
-    return leaf.ancestry.join("_") + "." + leaf.path.split(".").pop();
-}
+let projectFilePath;
 class IProjectService {
+    constructor() {
+        exports.projectFilePath$.subscribe(path => {
+            projectFilePath = path;
+            Archiver_1.ArchiveService.open(path);
+        });
+    }
     save(data, name) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (exports.projectFilePath$.value) {
+            if (projectFilePath) {
                 exports.tree$.next(data);
-                yield this.archiveData(name, exports.projectFilePath$.value, data);
-                console.log("Archive done");
+                yield this.archiveData(name, projectFilePath, data);
             }
             else {
                 yield this.saveAs(name, data);
@@ -34,26 +38,23 @@ class IProjectService {
     }
     saveAs(name, data) {
         return __awaiter(this, void 0, void 0, function* () {
-            exports.tree$.next(data);
             const path = yield DialogService_1.dialogService.saveAs(name);
             if (path.length < 1) {
                 console.log("User canceled save");
-                return exports.tree$.next(data);
             }
             ;
-            exports.projectFilePath$.next(path);
             yield this.archiveData(name, path, data);
-            console.log("Archive done");
         });
     }
     open() {
         return __awaiter(this, void 0, void 0, function* () {
             const path = yield DialogService_1.dialogService.selectProjectFile();
-            if (path.length > 1) {
-                exports.projectFilePath$.subscribe(path => Archiver_1.ArchiveService.open(path));
+            if (path) {
                 exports.projectFilePath$.next(path);
                 const projectTreePath = `${process.cwd()}\\temp\\project`;
-                exports.tree$.next(JSON.parse(fs_1.readFileSync(projectTreePath).toString()));
+                const newProjectTree = JSON.parse(fs_1.readFileSync(projectTreePath).toString());
+                exports.tree$.next(newProjectTree);
+                console.log(path);
             }
         });
     }
@@ -69,28 +70,34 @@ class IProjectService {
             };
             Archiver_1.ArchiveService.zipData(projectData);
             yield Archiver_1.ArchiveService.finishZip(path);
-            yield this.open;
+            yield this.open();
         });
     }
-    organizeFileToZip(leaf) {
-        const newFileName = renameLeaf(leaf);
-        const oldPath = leaf.path;
+    prepareFileForStorage(leaf) {
+        const newFileName = leaf.ancestry.join("_") + "." + this.getFileExtension(leaf.path);
         leaf.path = process.cwd() + "\\temp\\" + newFileName;
+    }
+    getFileExtension(path) {
+        return path.split(".").pop();
+    }
+    organizeFileToZip(leaf) {
+        const oldPath = leaf.path.toString();
+        this.prepareFileForStorage(leaf);
         return {
-            name: newFileName,
+            name: leaf.path,
             path: oldPath
         };
     }
     createFileArrayFromTree(tree) {
         const fileArray = [];
         const files$ = new rxjs_1.Subject();
-        let treeHolder = tree;
+        const mutableTree = _.cloneDeep(tree);
         files$.subscribe(next => {
             fileArray.push(next);
         });
-        this.treeNodesDepthFirst(treeHolder, this.organizeFileToZip, files$);
+        this.treeNodesDepthFirst(mutableTree, this.organizeFileToZip, files$);
+        exports.tree$.next(mutableTree);
         files$.complete();
-        exports.tree$.next(treeHolder);
         return fileArray;
     }
     treeNodesDepthFirst(leaf, fx, returnValues$) {

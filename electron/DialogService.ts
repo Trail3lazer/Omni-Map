@@ -31,7 +31,7 @@ class IDialogService {
             return actual.filePaths[0];
         };
         console.log("no paths returned");
-        return "";
+        return null;
     }
 
     public async saveAs(name: string): Promise<string> {

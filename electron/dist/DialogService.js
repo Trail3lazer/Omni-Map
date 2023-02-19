@@ -40,7 +40,7 @@ class IDialogService {
             }
             ;
             console.log("no paths returned");
-            return "";
+            return null;
         });
     }
     saveAs(name) {
